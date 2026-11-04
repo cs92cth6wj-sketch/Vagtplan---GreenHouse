@@ -408,16 +408,34 @@ with st.sidebar:
         st.session_state.clear()
         refresh()
 
-pages = ["Vagtplan", "Mine vagter", "Friønsker", "Timer"] + (["Administration"] if admin else [])
+# Medarbejderen ser kun ledige vagter og egne vagter.
+# Databasen håndhæver samme skel med RLS og get_employee_open_shifts().
+pages = (["Vagtplan", "Mine vagter", "Friønsker", "Timer", "Administration"]
+         if admin else ["Ledige vagter", "Mine vagter", "Friønsker", "Timer"])
+if not admin and st.session_state.get("active_page") == "Vagtplan":
+    st.session_state.active_page = "Ledige vagter"
 page = nav_buttons(pages)
 
 try:
-    shifts = get("shifts")
+    own_or_admin_shifts = get("shifts")  # Kun egne offentliggjorte vagter for medarbejdere (RLS).
+    if admin:
+        shifts = own_or_admin_shifts
+    else:
+        # Særskilt RPC afgiver kun information om LEDIGE vagter – uden kollegers ID/navn.
+        open_results = db.rpc("get_employee_open_shifts", {}).execute().data or []
+        if not isinstance(open_results, list):
+            raise ValueError("Uventet svar fra funktionen get_employee_open_shifts")
+        by_id = {s["id"]: s for s in open_results}
+        # Egen vagt har forrang. En udbudt egen vagt må ses under Mine vagter.
+        by_id.update({s["id"]: s for s in own_or_admin_shifts})
+        shifts = list(by_id.values())
     wishes = get("unavailability")
     st.session_state.cached_wishes = wishes
     settings = get("settings")
 except Exception as e:
     fail(e)
+    if not admin:
+        st.caption("Kontrollér, at V11_SQL_ADGANG.sql er kørt i Supabase.")
     st.stop()
 
 # Friønsker kontrolleres både i UI og igen i databasen (SQL-migrationen).
@@ -435,9 +453,10 @@ def qualified_staff(position, shift_day):
         and not has_day_off(person["id"], shift_day)
     ]
 
-if page == "Vagtplan":
-    st.subheader("Vagtoversigt")
-    st.caption("Alle offentliggjorte vagter – vælg en ledig vagt eller se, hvem der har den.")
+if page in ("Vagtplan", "Ledige vagter"):
+    st.subheader("Vagtoversigt" if admin else "Ledige vagter")
+    st.caption("Alle offentliggjorte vagter og deres bemanding." if admin
+               else "Kun vagter, som kan overtages. Dine egne vagter finder du under Mine vagter.")
 
     view = st.radio("Periode", ["Alle kommende", "Vælg uge"], horizontal=True)
     if view == "Vælg uge":
@@ -449,13 +468,19 @@ if page == "Vagtplan":
         last = None
 
     filt1, filt2 = st.columns(2, gap="small")
-    availability = filt1.selectbox("Status", ["Alle vagter", "Ledige / til overtagelse", "Besatte"])
+    if admin:
+        availability = filt1.selectbox("Status", ["Alle vagter", "Ledige / til overtagelse", "Besatte"])
+    else:
+        filt1.markdown("**Status**")
+        filt1.caption("Kun ledige vagter")
+        availability = "Ledige / til overtagelse"
     kind = filt2.selectbox("Funktion", ["Alle", "Tjener", "Opvasker"])
     layout = st.radio("Visning", ["Kompakte kort", "Kompakt liste"], horizontal=True)
 
     published = [
         s for s in shifts
         if s["published"]
+        and (admin or (s["offered"] and s["employee_id"] != me["id"]))
         and s["shift_day"] >= first.isoformat()
         and (last is None or s["shift_day"] <= last.isoformat())
         and (kind == "Alle" or s["position"] == kind)
@@ -469,9 +494,15 @@ if page == "Vagtplan":
 
     m1, m2 = st.columns(2, gap="small")
     with m1:
-        summary_card("Viste vagter", len(published))
+        summary_card("Viste vagter" if admin else "Ledige vagter", len(published))
     with m2:
-        summary_card("Ledige / til overtagelse", sum(bool(s["offered"]) for s in published))
+        if admin:
+            summary_card("Ledige / til overtagelse", sum(bool(s["offered"]) for s in published))
+        else:
+            summary_card("Vagter du kan overtage", sum(
+                bool(s["offered"]) and not has_day_off(me["id"], s["shift_day"])
+                and (me["can_waiter"] if s["position"] == "Tjener" else me["can_dishwasher"])
+                for s in published))
 
     if not published:
         notice("Ingen offentliggjorte vagter matcher dine filtre.")
