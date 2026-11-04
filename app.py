@@ -14,98 +14,92 @@ st.set_page_config(
 )
 
 st.markdown("""<style>
-:root { color-scheme: light; }
-.stApp, [data-testid="stAppViewContainer"] {background:#F7F8F5; color:#20372C;}
-[data-testid="stHeader"] {background:transparent;}
-.block-container {max-width:1120px; padding-top:2rem; padding-bottom:3rem;}
-h1,h2,h3,h4 {color:#20372C; letter-spacing:-.02em;}
-[data-testid="stWidgetLabel"] * {color:#20372C !important; font-weight:600;}
-[data-testid="stCaptionContainer"] {color:#6E8074 !important;}
-/* Individual widgets, no styling of all div/span/svg elements. */
-[data-testid="stTextInput"] [data-baseweb="input"],
-[data-testid="stTextArea"] [data-baseweb="textarea"],
-[data-testid="stSelectbox"] [data-baseweb="select"] > div,
-[data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
-[data-testid="stNumberInput"] [data-baseweb="input"] {
-  background:#FFFFFF !important; color:#20372C !important;
-  border:1px solid #CBD5CC !important; border-radius:10px !important;
+/* SGK v4: one high-contrast theme; controls are intentionally dark with white text.
+   Do not paint individual nested selectbox layers white: Streamlit leaves
+   the other layers dark, creating invisible text. */
+:root {color-scheme:light;}
+.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {
+ background:#F7F8F5 !important;color:#20372C !important;
 }
-[data-testid="stTextInput"] input,
-[data-testid="stTextArea"] textarea,
-[data-testid="stSelectbox"] [data-baseweb="select"] input,
-[data-testid="stSelectbox"] [data-baseweb="select"] span,
-[data-testid="stSelectbox"] [data-baseweb="select"] div,
-[data-testid="stNumberInput"] input {
-  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
-  caret-color:#20372C !important;
+[data-testid="stHeader"]{background:transparent !important;}
+.block-container{max-width:1120px !important;padding-top:2rem !important;padding-bottom:3rem !important;}
+h1,h2,h3,h4,h5,h6{color:#20372C !important;letter-spacing:-.02em;}
+[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] *,
+[data-testid="stCheckbox"] label,[data-testid="stRadio"] label {color:#20372C !important;opacity:1 !important;}
+[data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] *{color:#66796E !important;opacity:1 !important;}
+
+/* Stable input foreground and background for ALL Streamlit forms */
+.stApp [data-baseweb="input"],
+.stApp [data-baseweb="base-input"],
+.stApp [data-baseweb="textarea"],
+.stApp [data-baseweb="select"],
+.stApp [data-baseweb="select"]>div,
+.stApp [data-baseweb="select"]>div>div,
+.stApp [data-testid="stDateInput"] [data-baseweb="input"]{
+ background:#26332F !important;color:#FFFFFF !important;border-color:#46584D !important;
 }
-[data-baseweb="popover"] [role="listbox"], [role="listbox"], [role="option"] {
-  background:#FFFFFF !important; color:#20372C !important;
+.stApp [data-baseweb="select"]>div,
+.stApp [data-baseweb="input"],
+.stApp [data-baseweb="textarea"]{border:1px solid #46584D !important;border-radius:10px !important;}
+.stApp input,.stApp textarea,
+.stApp [data-baseweb="select"] input,
+.stApp [data-baseweb="select"] span,
+.stApp [data-baseweb="select"] [aria-selected],
+.stApp [data-baseweb="select"]>div *{
+ color:#FFFFFF !important;-webkit-text-fill-color:#FFFFFF !important;caret-color:#FFFFFF !important;
 }
-[data-baseweb="popover"] [role="option"] *, [role="option"] * { color:#20372C !important; }
-[data-testid="stButton"] button, [data-testid="stFormSubmitButton"] button,
-[data-testid="stDownloadButton"] button {
-  background:#FFFFFF !important; color:#20372C !important;
-  border:1px solid #C9D5CC !important; border-radius:11px !important;
-  min-height:2.55rem; font-weight:600;
+.stApp input::placeholder,.stApp textarea::placeholder{color:#D5DDD7 !important;-webkit-text-fill-color:#D5DDD7 !important;opacity:1 !important;}
+.stApp [data-baseweb="select"] svg,.stApp [data-baseweb="input"] svg{color:#FFFFFF !important;fill:#FFFFFF !important;}
+/* Popovers are portals and sometimes rendered outside .stApp */
+[data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"],
+[data-baseweb="popover"] [role="option"]{
+ background:#26332F !important;color:#FFFFFF !important;
 }
+[data-baseweb="popover"] *,[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] *{
+ color:#FFFFFF !important;-webkit-text-fill-color:#FFFFFF !important;
+}
+[role="option"]:hover,[role="option"][aria-selected="true"]{background:#45594D !important;}
+/* Native date picker fallback */
+[data-baseweb="calendar"],[data-baseweb="calendar"] * {background-color:#26332F !important;color:#FFFFFF !important;}
+[data-baseweb="calendar"] button[aria-selected="true"]{background:#CCAD61 !important;color:#20372C !important;}
+
+/* Primary actions and secondary navigation */
+[data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,
+[data-testid="stDownloadButton"] button{
+ background:#FFFFFF !important;color:#20372C !important;border:1px solid #C3D0C6 !important;
+ border-radius:11px !important;min-height:2.6rem !important;font-weight:650 !important;
+}
+[data-testid="stButton"] button *,[data-testid="stFormSubmitButton"] button *,
+[data-testid="stDownloadButton"] button *{color:inherit !important;}
 [data-testid="stButton"] button[kind="primary"],
 [data-testid="stFormSubmitButton"] button[kind="primary"],
-button[data-testid="stBaseButton-primary"] {
-  background:#CCAD61 !important; border-color:#CCAD61 !important;
-  color:#20372C !important;
+button[data-testid="stBaseButton-primary"]{
+ background:#CCAD61 !important;color:#20372C !important;border-color:#CCAD61 !important;
 }
-button[role="tab"],button[role="tab"] * {color:#20372C !important;}
-/* Administration tabs: opaque foreground for both selected and unselected tabs. */
-.stApp [data-testid="stTabs"] [data-baseweb="tab-list"],
-.stApp [data-testid="stTabs"] [data-baseweb="tab-border"] {background:transparent !important;}
-.stApp [data-testid="stTabs"] button[role="tab"],
-.stApp [data-testid="stTabs"] button[role="tab"] *,
-.stApp [data-testid="stTabs"] [data-baseweb="tab"] *,
-.stApp [data-testid="stTabs"] button[role="tab"] p {
-  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
-  opacity:1 !important; text-shadow:none !important;
+[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover{
+ background:#F5EACA !important;border-color:#AE8D45 !important;
 }
-.stApp [data-testid="stTabs"] button[role="tab"] {background:transparent !important;}
-.stApp [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-  border-bottom:3px solid #CCAD61 !important; font-weight:750 !important;
+[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible{
+ outline:3px solid #A17F2E !important;outline-offset:2px !important;
 }
-.stApp [data-testid="stTabs"] button[role="tab"]:hover {
-  background:#F0F4EF !important;
-}
-/* Light dropdowns including the rightmost arrow region. */
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"],
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"] svg {
-  background-color:#FFFFFF !important; color:#20372C !important;
-}
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"] span {
-  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
-}
-.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div {
-  border:1px solid #CBD5CC !important; border-radius:10px !important;
-}
-[data-testid="stAlert"] {border-radius:12px !important;}
-[data-testid="stExpander"] details {background:#FFFFFF; border-radius:12px;}
-[data-testid="stPopoverBody"] {background:#FFFFFF !important; color:#20372C !important; border:1px solid #E1E7E2 !important;}
-[data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px;}
-.status-pill {display:inline-block;padding:4px 10px;border-radius:50px;
-  font-size:.81rem;font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
-.status-pill.gray {background:#EEF2EE;color:#516257;}
-.status-pill.green {background:#E7F4EA;color:#326947;}
-.card-title {font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
-.card-sub {font-size:.93rem;color:#6B7C70;margin-top:4px;}
-.summary-box {background:#FFFFFF;border:1px solid #E1E7E2;border-radius:14px;
-  padding:14px 18px;min-height:88px;}
-.summary-label {color:#6F8175;font-size:.9rem;margin-bottom:7px;}
-.summary-value {color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
-.table-wrap {border:1px solid #E1E7E2;border-radius:13px;overflow-x:auto;background:#FFF;}
-.table-clean {width:100%;border-collapse:collapse;font-size:.91rem;}
-.table-clean th {text-align:left;background:#F2F5F1;color:#20372C;padding:11px 13px;white-space:nowrap;}
-.table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #ECF0ED;}
-@media(max-width:760px){.block-container{padding:1rem .8rem 3rem !important;}
- h1{font-size:1.85rem !important;}}
+[data-testid="stCheckbox"] *,[data-testid="stRadio"] *{opacity:1 !important;}
+[data-testid="stAlert"]{border-radius:12px !important;}
+[data-testid="stExpander"] details{background:#FFF !important;border:1px solid #E1E7E2 !important;border-radius:12px !important;}
+[data-testid="stVerticalBlockBorderWrapper"]{border-radius:14px !important;}
+.status-pill{display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;
+ font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
+.status-pill.gray{background:#EEF2EE;color:#516257;}
+.status-pill.green{background:#E7F4EA;color:#326947;}
+.card-title{font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
+.card-sub{font-size:.93rem;color:#51685A;margin-top:4px;}
+.summary-box{background:#FFF;border:1px solid #DDE6DE;border-radius:14px;padding:14px 18px;min-height:88px;}
+.summary-label{color:#51685A;font-size:.9rem;margin-bottom:7px;}
+.summary-value{color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
+.table-wrap{border:1px solid #DDE6DE;border-radius:13px;overflow-x:auto;background:#FFF;}
+.table-clean{width:100%;border-collapse:collapse;font-size:.91rem;}
+.table-clean th{text-align:left;background:#EDF3EC;color:#20372C;padding:11px 13px;white-space:nowrap;}
+.table-clean td{color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
+@media(max-width:760px){.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
 </style>""",unsafe_allow_html=True)
 
 try:
@@ -518,9 +512,19 @@ elif page == "Timer":
 
 elif page == "Administration" and admin:
     st.subheader("Administration")
-    tab1, tab2, tab3, tab4 = st.tabs(["Opret vagt", "Styr vagter", "Friønsker", "Medarbejdere"])
+    sections = ["Opret vagt", "Styr vagter", "Friønsker", "Medarbejdere"]
+    if st.session_state.get("admin_section") not in sections:
+        st.session_state.admin_section = sections[0]
+    section_cols = st.columns(4, gap="small")
+    for section_col, section_name in zip(section_cols, sections):
+        if section_col.button(section_name, key="admin_section_" + section_name,
+                              type="primary" if st.session_state.admin_section == section_name else "secondary",
+                              use_container_width=True):
+            st.session_state.admin_section = section_name
+            st.rerun()
+    st.divider()
 
-    with tab1:
+    if st.session_state.admin_section == "Opret vagt":
         st.caption("Opret nye vagter og vælg, om de skal være ledige, tildelt eller låste.")
         day = calendar_picker("Dato for vagten", "new_shift_date", date.today())
         with st.form("new_shift", clear_on_submit=True):
@@ -569,7 +573,7 @@ elif page == "Administration" and admin:
                 except Exception as e:
                     fail(e)
 
-    with tab2:
+    elif st.session_state.admin_section == "Styr vagter":
         st.caption("Ændringer gemmes direkte. Ikke-offentliggjorte vagter kan kun ses af admin.")
         upcoming = sorted(
             [s for s in shifts if s["shift_day"] >= date.today().isoformat()],
@@ -609,7 +613,7 @@ elif page == "Administration" and admin:
                     except Exception as e:
                         fail(e)
 
-    with tab3:
+    elif st.session_state.admin_section == "Friønsker":
         current_deadline = None
         if settings and settings[0].get("wishes_deadline"):
             current_deadline = date.fromisoformat(settings[0]["wishes_deadline"])
@@ -628,7 +632,7 @@ elif page == "Administration" and admin:
         else:
             st.info("Ingen friønsker registreret.")
 
-    with tab4:
+    elif st.session_state.admin_section == "Medarbejdere":
         st.caption("Opret først brugeren i Supabase → Authentication → Users. Indsæt derefter brugerens UUID her.")
         with st.form("add_staff"):
             uid = st.text_input("Bruger-UUID fra Supabase")
@@ -639,6 +643,9 @@ elif page == "Administration" and admin:
             dishwasher = c2.checkbox("Kan være opvasker", True)
             if st.form_submit_button("Tilføj medarbejder", type="primary"):
                 try:
+                    if any(x["id"] == uid.strip() for x in staff):
+                        st.warning("Denne bruger findes allerede i medarbejderlisten. Opret ikke samme bruger igen.")
+                        st.stop()
                     db.table("staff").insert(
                         {
                             "id": uid.strip(),
