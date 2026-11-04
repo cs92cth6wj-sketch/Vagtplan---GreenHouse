@@ -99,6 +99,13 @@ h1,h2,h3,h4,h5,h6 {color:#20372C !important;letter-spacing:-.02em;}
 .table-clean th {text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
 .table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
 @media(max-width:760px) {.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
+
+/* Tæt og ensartet vagtoversigt */
+.shift-date { font-weight: 750; color: #20372C; margin-bottom: 9px; font-size: .95rem; }
+.shift-time { font-size: 1.15rem; font-weight: 760; color: #20372C; margin-top: 7px; }
+.shift-role { font-size: .9rem; font-weight: 600; color: #20372C; margin-top: 2px; }
+.shift-person { font-size: .85rem; color: #5F7064; margin: 8px 0 12px; min-height: 2.1em; overflow-wrap:anywhere; }
+[data-testid="stVerticalBlockBorderWrapper"] { border-color: #DFE5DE !important; background: #FFFFFF !important; }
 </style>""",unsafe_allow_html=True)
 
 try:
@@ -280,6 +287,66 @@ def render_shift_card(shift, names, current_user_id=None, allow_actions=True, co
                         fail(e)
 
 
+
+
+def shift_action(shift, current_user_id, key_prefix="grid"):
+    """Vis en funktionel handling på vagten; alle databasekontroller bevares."""
+    sid = shift["id"]
+    if shift["offered"] and not shift["locked"] and shift["employee_id"] != current_user_id:
+        if has_day_off(current_user_id, shift["shift_day"]):
+            st.caption("Friønske – kan ikke overtages")
+        elif st.button("Overtag", key=f"{key_prefix}_claim_{sid}", type="primary", use_container_width=True):
+            try:
+                db.rpc("claim_shift", {"p_shift": sid}).execute()
+                st.success("Vagten er overtaget")
+                refresh()
+            except Exception as e:
+                fail(e)
+    elif shift["employee_id"] == current_user_id and not shift["locked"]:
+        label = "Træk tilbage" if shift["offered"] else "Udbyd"
+        if st.button(label, key=f"{key_prefix}_offer_{sid}", use_container_width=True):
+            try:
+                db.rpc("cancel_my_offer" if shift["offered"] else "offer_my_shift", {"p_shift": sid}).execute()
+                refresh()
+            except Exception as e:
+                fail(e)
+    elif shift["locked"]:
+        st.caption("Låst vagt")
+    else:
+        st.caption("Tildelt")
+
+
+def render_compact_shift(shift, names, current_user_id, view="cards"):
+    """Kompakt vagt med dato, status og handlingsknap."""
+    d = date.fromisoformat(shift["shift_day"])
+    weekdays = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"]
+    short_day = f"{weekdays[d.weekday()]} {d:%d/%m/%Y}"
+    status = shift_state(shift)
+    status_class = shift_status_class(shift)
+    who = format_shift_note(shift, names)
+    duration = f"{hours(shift):g}".replace(".", ",")
+    if view == "cards":
+        with st.container(border=True):
+            st.markdown(f"<div class='shift-date'>{escape(short_day)}</div>", unsafe_allow_html=True)
+            st.markdown(f"<span class='status-pill {status_class}'>{escape(status)}</span>", unsafe_allow_html=True)
+            st.markdown(f"<div class='shift-time'>{escape(shift['start_time'][:5])}–{escape(shift['end_time'][:5])}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='shift-role'>{escape(shift['position'])} · {duration} timer</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='shift-person'>{escape(who)}</div>", unsafe_allow_html=True)
+            if shift.get("notes"):
+                st.caption(shift["notes"])
+            shift_action(shift, current_user_id, key_prefix="card")
+    else:
+        with st.container(border=True):
+            left, middle, action = st.columns([2, 2.1, 1.1], gap="small", vertical_alignment="center")
+            with left:
+                st.markdown(f"**{escape(short_day)}**")
+                st.caption(f"{shift['start_time'][:5]}–{shift['end_time'][:5]} · {duration} t")
+            with middle:
+                st.markdown(f"**{escape(shift['position'])}** · {escape(status)}")
+                st.caption(who)
+            with action:
+                shift_action(shift, current_user_id, key_prefix="list")
+
 def render_html_table(df):
     if df.empty:
         return
@@ -370,7 +437,7 @@ def qualified_staff(position, shift_day):
 
 if page == "Vagtplan":
     st.subheader("Vagtoversigt")
-    st.caption("Kun offentliggjorte vagter. Ubesatte og udbudte vagter kan overtages; øvrige viser, hvem der er på arbejde.")
+    st.caption("Alle offentliggjorte vagter – vælg en ledig vagt eller se, hvem der har den.")
 
     view = st.radio("Periode", ["Alle kommende", "Vælg uge"], horizontal=True)
     if view == "Vælg uge":
@@ -384,6 +451,7 @@ if page == "Vagtplan":
     filt1, filt2 = st.columns(2, gap="small")
     availability = filt1.selectbox("Status", ["Alle vagter", "Ledige / til overtagelse", "Besatte"])
     kind = filt2.selectbox("Funktion", ["Alle", "Tjener", "Opvasker"])
+    layout = st.radio("Visning", ["Kompakte kort", "Kompakt liste"], horizontal=True)
 
     published = [
         s for s in shifts
@@ -407,16 +475,17 @@ if page == "Vagtplan":
 
     if not published:
         notice("Ingen offentliggjorte vagter matcher dine filtre.")
+    elif layout == "Kompakte kort":
+        # Tre kort på hver række på desktop. Streamlit stabler dem på smalle skærme.
+        for i in range(0, len(published), 3):
+            columns = st.columns(3, gap="small")
+            for col, shift in zip(columns, published[i:i+3]):
+                with col:
+                    render_compact_shift(shift, names, me["id"], "cards")
     else:
-        weekdays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
-        grouped = {}
+        # Ekstra kompakt: én vagt på hver række med handling i højre side.
         for shift in published:
-            grouped.setdefault(shift["shift_day"], []).append(shift)
-        for day, items in grouped.items():
-            d = date.fromisoformat(day)
-            st.markdown(f"### {weekdays[d.weekday()]} {d:%d/%m/%Y}")
-            for shift in items:
-                render_shift_card(shift, names, current_user_id=me["id"], allow_actions=True)
+            render_compact_shift(shift, names, me["id"], "list")
 
 elif page == "Mine vagter":
     mine = sorted(
