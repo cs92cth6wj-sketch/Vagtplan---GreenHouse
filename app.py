@@ -14,67 +14,74 @@ st.set_page_config(
 )
 
 st.markdown("""<style>
-/* SGK: samlet lyst tema. Lysegrå kontrolfelter med mørk, læsbar tekst. */
-:root {color-scheme:light;}
-.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {
- background:#F7F8F5 !important;color:#20372C !important;
+/* SGK V6 – one coherent light palette. No blue UI elements. */
+:root {color-scheme: light !important; --sgk-text:#20372C; --sgk-control:#F0F2F0; --sgk-border:#CCD4CD; --sgk-gold:#CCAD61;}
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+  background-color:#F7F8F5 !important; color:#20372C !important;
 }
-[data-testid="stHeader"]{background:transparent !important;}
-.block-container{max-width:1120px !important;padding-top:2rem !important;padding-bottom:3rem !important;}
-h1,h2,h3,h4,h5,h6{color:#20372C !important;letter-spacing:-.02em;}
-[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] *,
-[data-testid="stCheckbox"] label,[data-testid="stRadio"] label {color:#20372C !important;opacity:1 !important;}
-[data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] *{color:#66796E !important;opacity:1 !important;}
-/* Alle Streamlit-inputs, inkl. indre lag af selectbox / date / tekst. */
-.stApp [data-baseweb="input"],
-.stApp [data-baseweb="base-input"],
-.stApp [data-baseweb="textarea"],
-.stApp [data-baseweb="select"],
-.stApp [data-baseweb="select"]>div,
-.stApp [data-baseweb="select"]>div>div,
-.stApp [data-testid="stDateInput"] [data-baseweb="input"] {
- background:#F0F2F0 !important;color:#20372C !important;border-color:#CBD2CC !important;
+[data-testid="stHeader"] {background:transparent !important;}
+.block-container {max-width:1120px !important;padding-top:2rem !important;padding-bottom:3rem !important;}
+h1,h2,h3,h4,h5,h6 {color:#20372C !important;letter-spacing:-.02em;}
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] *,
+[data-testid="stCheckbox"] label, [data-testid="stRadio"] label {color:#20372C !important;opacity:1 !important;}
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] * {color:#66796E !important;opacity:1 !important;}
+
+/* Input wrappers, including BaseWeb internal layers. */
+.stApp div[data-baseweb="input"], .stApp div[data-baseweb="base-input"],
+.stApp div[data-baseweb="textarea"], .stApp div[data-baseweb="select"],
+.stApp div[data-baseweb="select"]>div, .stApp div[data-baseweb="select"]>div>div,
+.stApp [data-testid="stTextInput"] div[data-baseweb="input"],
+.stApp [data-testid="stDateInput"] div[data-baseweb="input"],
+.stApp [data-testid="stSelectbox"] div[data-baseweb="select"],
+.stApp [data-testid="stTextArea"] div[data-baseweb="textarea"] {
+  background-color:#F0F2F0 !important;
+  color:#20372C !important;
+  border-color:#CCD4CD !important;
+  box-shadow:none !important;
 }
-.stApp [data-baseweb="select"]>div,
-.stApp [data-baseweb="input"],
-.stApp [data-baseweb="textarea"] {border:1px solid #CBD2CC !important;border-radius:10px !important;}
-.stApp input,.stApp textarea,
-.stApp [data-baseweb="select"] input,
-.stApp [data-baseweb="select"] span,
-.stApp [data-baseweb="select"] [aria-selected],
-.stApp [data-baseweb="select"]>div * {
- color:#20372C !important;-webkit-text-fill-color:#20372C !important;caret-color:#20372C !important;
+.stApp div[data-baseweb="input"], .stApp div[data-baseweb="select"]>div,
+.stApp div[data-baseweb="textarea"] {
+  border:1px solid #CCD4CD !important; border-radius:11px !important;
 }
-.stApp input::placeholder,.stApp textarea::placeholder {
- color:#65746A !important;-webkit-text-fill-color:#65746A !important;opacity:1 !important;
+.stApp input, .stApp textarea, .stApp select,
+.stApp div[data-baseweb="select"] input,
+.stApp div[data-baseweb="select"] span,
+.stApp div[data-baseweb="select"] [role="combobox"],
+.stApp div[data-baseweb="select"] [aria-selected],
+.stApp div[data-baseweb="select"]>div *,
+.stApp [data-testid="stTextInput"] input {
+  background-color:transparent !important;
+  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+  caret-color:#20372C !important; opacity:1 !important;
 }
-.stApp [data-baseweb="select"] svg,.stApp [data-baseweb="input"] svg {
- color:#20372C !important;fill:#20372C !important;
+.stApp input::placeholder, .stApp textarea::placeholder {
+  color:#63766A !important; -webkit-text-fill-color:#63766A !important;opacity:1 !important;
 }
-.stApp [data-baseweb="input"]:focus-within,
-.stApp [data-baseweb="select"]:focus-within,
-.stApp [data-baseweb="textarea"]:focus-within {
- outline:2px solid #CCAD61 !important;outline-offset:1px !important;
+.stApp div[data-baseweb="select"] svg, .stApp div[data-baseweb="input"] svg {
+  color:#20372C !important;fill:#20372C !important;
 }
-/* Popup-menuer kan ligge uden for .stApp. */
-[data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"],
-[data-baseweb="popover"] [role="option"] {
- background:#F7F8F5 !important;color:#20372C !important;
+.stApp div[data-baseweb="input"]:focus-within,
+.stApp div[data-baseweb="select"]:focus-within,
+.stApp div[data-baseweb="textarea"]:focus-within {
+  border-color:#A58B4D !important; outline:2px solid #CCAD61 !important;
+  outline-offset:0 !important;box-shadow:0 0 0 1px #CCAD61 !important;
 }
-[data-baseweb="popover"] *,[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] * {
+/* The list popup can be rendered outside .stApp */
+div[data-baseweb="popover"],div[data-baseweb="menu"],div[role="listbox"],
+li[role="option"],div[role="option"] {background:#FFFFFF !important;color:#20372C !important;}
+div[data-baseweb="popover"] *,div[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] * {
  color:#20372C !important;-webkit-text-fill-color:#20372C !important;
 }
-[role="option"]:hover,[role="option"][aria-selected="true"] {background:#E6EAE6 !important;}
-/* Native datovælger hvis en ny senere tilføjes */
-[data-baseweb="calendar"],[data-baseweb="calendar"] * {
- background-color:#F7F8F5 !important;color:#20372C !important;
-}
+[role="option"]:hover,[role="option"][aria-selected="true"] {background:#EFE5CB !important;}
+/* Date popups, if any date widget is introduced again. */
+[data-baseweb="calendar"], [data-baseweb="calendar"] * {background-color:#FFFFFF !important;color:#20372C !important;}
 [data-baseweb="calendar"] button[aria-selected="true"] {background:#CCAD61 !important;color:#20372C !important;}
-/* Knapper: hvide sekundære, SGK-guld primære */
+/* Buttons, navigation and hover/focus states. */
 [data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,
 [data-testid="stDownloadButton"] button {
- background:#FFFFFF !important;color:#20372C !important;border:1px solid #CBD2CC !important;
- border-radius:11px !important;min-height:2.6rem !important;font-weight:650 !important;
+ background:#FFFFFF !important;color:#20372C !important;border:1px solid #CCD4CD !important;
+ border-radius:11px !important;min-height:2.6rem !important; font-weight:650 !important;
+ box-shadow:none !important;
 }
 [data-testid="stButton"] button *,[data-testid="stFormSubmitButton"] button *,
 [data-testid="stDownloadButton"] button * {color:inherit !important;}
@@ -83,30 +90,34 @@ h1,h2,h3,h4,h5,h6{color:#20372C !important;letter-spacing:-.02em;}
 button[data-testid="stBaseButton-primary"] {
  background:#CCAD61 !important;color:#20372C !important;border-color:#CCAD61 !important;
 }
-[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover {
- background:#F5EACA !important;border-color:#AE8D45 !important;
+[data-testid="stButton"] button:hover, [data-testid="stDownloadButton"] button:hover {
+ background:#F4EACD !important;border-color:#A58B4D !important;
 }
-[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible {
- outline:3px solid #A17F2E !important;outline-offset:2px !important;
-}
+[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible,
+[data-testid="stDownloadButton"] button:focus-visible {outline:3px solid #CCAD61 !important;outline-offset:2px !important;}
+/* Native checkbox and radio accents, not blue/red. */
+input[type="checkbox"],input[type="radio"] {accent-color:#A58B4D !important;}
 [data-testid="stCheckbox"] *,[data-testid="stRadio"] * {opacity:1 !important;}
-[data-testid="stAlert"]{border-radius:12px !important;}
+/* Neutral message cards replace native blue st.info. */
+.sgk-notice {background:#F0F2F0;border:1px solid #CCD4CD;border-left:4px solid #CCAD61;
+ border-radius:12px;padding:15px 18px;color:#20372C;font-size:.95rem;line-height:1.5;}
+.sgk-notice strong {color:#20372C;}
 [data-testid="stExpander"] details {background:#FFF !important;border:1px solid #DFE4DF !important;border-radius:12px !important;}
-[data-testid="stVerticalBlockBorderWrapper"]{border-radius:14px !important;}
-.status-pill{display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;
+[data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px !important;}
+.status-pill {display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;
  font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
-.status-pill.gray{background:#EEF2EE;color:#516257;}
-.status-pill.green{background:#E7F4EA;color:#326947;}
-.card-title{font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
-.card-sub{font-size:.93rem;color:#51685A;margin-top:4px;}
-.summary-box{background:#FFF;border:1px solid #DFE4DF;border-radius:14px;padding:14px 18px;min-height:88px;}
-.summary-label{color:#51685A;font-size:.9rem;margin-bottom:7px;}
-.summary-value{color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
-.table-wrap{border:1px solid #DFE4DF;border-radius:13px;overflow-x:auto;background:#FFF;}
-.table-clean{width:100%;border-collapse:collapse;font-size:.91rem;}
-.table-clean th{text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
-.table-clean td{color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
-@media(max-width:760px){.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
+.status-pill.gray {background:#EEF2EE;color:#516257;}
+.status-pill.green {background:#E7F4EA;color:#326947;}
+.card-title {font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
+.card-sub {font-size:.93rem;color:#51685A;margin-top:4px;}
+.summary-box {background:#FFF;border:1px solid #DFE4DF;border-radius:14px;padding:14px 18px;min-height:88px;}
+.summary-label {color:#51685A;font-size:.9rem;margin-bottom:7px;}
+.summary-value {color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
+.table-wrap {border:1px solid #DFE4DF;border-radius:13px;overflow-x:auto;background:#FFF;}
+.table-clean {width:100%;border-collapse:collapse;font-size:.91rem;}
+.table-clean th {text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
+.table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
+@media(max-width:760px) {.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
 </style>""",unsafe_allow_html=True)
 
 try:
@@ -123,6 +134,11 @@ db = st.session_state.db
 
 def get(table):
     return db.table(table).select("*").execute().data or []
+
+
+def notice(message):
+    """Neutral information notice – avoids Streamlit's blue default alert."""
+    st.markdown(f'<div class="sgk-notice">{escape(str(message))}</div>', unsafe_allow_html=True)
 
 
 def fail(e):
@@ -391,7 +407,7 @@ if page == "Vagtplan":
         summary_card("Ledige / til overtagelse", sum(bool(s["offered"]) for s in published))
 
     if not published:
-        st.info("Ingen offentliggjorte vagter matcher dine filtre.")
+        notice("Ingen offentliggjorte vagter matcher dine filtre.")
     else:
         weekdays = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
         grouped = {}
@@ -412,7 +428,7 @@ elif page == "Mine vagter":
     st.caption("Her kan du se dine kommende vagter og udbyde dem igen, hvis du bliver forhindret.")
     summary_card("Kommende vagter", len(mine))
     if not mine:
-        st.info("Du har ingen kommende vagter.")
+        notice("Du har ingen kommende vagter.")
     else:
         last_day = None
         for shift in mine:
@@ -439,7 +455,7 @@ elif page == "Friønsker":
                 except Exception as e:
                     fail(e)
     else:
-        st.info("Der er ikke åbent for nye friønsker lige nu.")
+        notice("Der er ikke åbent for nye friønsker lige nu.")
 
     if mine:
         rows = pd.DataFrame(
@@ -480,7 +496,7 @@ elif page == "Timer":
     } for s in sorted(assigned, key=lambda x: (x["shift_day"], x["start_time"]))]
     assigned_df = pd.DataFrame(assigned_rows, columns=["Dato", "Navn", "Funktion", "Fra", "Til", "Planlagte timer"])
     if assigned_df.empty:
-        st.info("Ingen tildelte vagter i den valgte måned.")
+        notice("Ingen tildelte vagter i den valgte måned.")
         summary = pd.DataFrame(columns=["Navn", "Timer"])
     else:
         summary = assigned_df.groupby("Navn", as_index=False)["Planlagte timer"].sum()
@@ -587,7 +603,7 @@ elif page == "Administration" and admin:
             key=lambda s: (s["shift_day"], s["start_time"]),
         )
         if not upcoming:
-            st.info("Ingen kommende vagter")
+            notice("Ingen kommende vagter")
         for s in upcoming:
             with st.expander(f"{s['shift_day']} · {display_shift(s, names)} · {'Publiceret' if s['published'] else 'Kladde'}"):
                 opts = {"Ledig": None, **{x['name'] + ' · ' + x['id'][:6]: x['id'] for x in staff if x['active'] and (x['can_waiter'] if s['position'] == 'Tjener' else x['can_dishwasher'])}}
@@ -637,7 +653,7 @@ elif page == "Administration" and admin:
             )
             render_html_table(wish_rows)
         else:
-            st.info("Ingen friønsker registreret.")
+            notice("Ingen friønsker registreret.")
 
     elif st.session_state.admin_section == "Medarbejdere":
         st.caption("Opret først brugeren i Supabase → Authentication → Users. Indsæt derefter brugerens UUID her.")
