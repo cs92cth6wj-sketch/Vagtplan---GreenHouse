@@ -8,107 +8,80 @@ st.set_page_config(page_title="SGK Café | Vagtplan",page_icon="📅",layout="wi
 # En ensartet lys visning på både mobil og desktop.
 # Farverne er også fastlagt i .streamlit/config.toml.
 st.markdown("""<style>
-/* SGK design: alle kontroller har lyse flader og læsbar mørk tekst. */
-:root { color-scheme: light; }
+/* SGK Café: let, sammenhængende tema. Undgå globale span/p-regler, som
+   tidligere gjorde kontroltekst mørk på mørke Streamlit-widgets. */
+:root { color-scheme: light !important; }
 html, body, .stApp, [data-testid="stAppViewContainer"],
-[data-testid="stMain"], [data-testid="stMainBlockContainer"] {
-  background: #F8F9F7 !important;
-  color: #21352B !important;
+[data-testid="stMain"], [data-testid="stHeader"] {
+  background-color: #F8F9F7 !important; color: #21352B !important;
 }
-[data-testid="stHeader"] { background: rgba(248,249,247,.97) !important; }
-[data-testid="stSidebar"] { background: #EDF1EB !important; }
-[data-testid="stAppViewContainer"] h1,
-[data-testid="stAppViewContainer"] h2,
-[data-testid="stAppViewContainer"] h3,
-[data-testid="stAppViewContainer"] h4,
-[data-testid="stAppViewContainer"] p,
-[data-testid="stAppViewContainer"] label,
-[data-testid="stAppViewContainer"] span,
-[data-testid="stAppViewContainer"] small,
-[data-testid="stAppViewContainer"] .stMarkdown { color: #21352B; }
-h1 { color: #21352B !important; font-weight: 750 !important; letter-spacing: -.025em; }
-h2,h3 { color: #21352B !important; }
-/* Inputs & baseweb wrappers (date, select, segmented control) */
-[data-testid="stTextInput"] [data-baseweb="input"],
+h1, h2, h3 { color: #21352B !important; }
+h1 { letter-spacing: -.025em; font-weight: 750 !important; }
+/* Interne input-containere og selve inputelementerne */
+div[data-baseweb="input"], div[data-baseweb="textarea"],
+div[data-baseweb="select"], div[data-baseweb="select"] > div,
 [data-testid="stDateInput"] [data-baseweb="input"],
-[data-testid="stNumberInput"] [data-baseweb="input"],
-[data-testid="stTimeInput"] [data-baseweb="input"],
-[data-testid="stTextArea"] [data-baseweb="textarea"],
-[data-testid="stSelectbox"] [data-baseweb="select"],
-[data-testid="stMultiSelect"] [data-baseweb="select"] {
-  background-color: #FFFFFF !important;
-  border: 1px solid #C8D2CA !important;
-  border-radius: 9px !important;
-}
-[data-testid="stTextInput"] input,
-[data-testid="stDateInput"] input,
-[data-testid="stNumberInput"] input,
-[data-testid="stTimeInput"] input,
-[data-testid="stTextArea"] textarea,
-[data-testid="stSelectbox"] [data-baseweb="select"] > div,
-[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+[data-testid="stTimeInput"] [data-baseweb="input"] {
   background: #FFFFFF !important;
+  border-color: #BFCBC1 !important;
   color: #21352B !important;
-  -webkit-text-fill-color: #21352B !important;
-  caret-color: #21352B !important;
 }
-[data-testid="stTextInput"] input::placeholder,
-[data-testid="stTextArea"] textarea::placeholder { color: #79867D !important; -webkit-text-fill-color: #79867D !important; }
-[data-testid="stDateInput"] svg,
-[data-testid="stSelectbox"] svg,
-[data-testid="stMultiSelect"] svg { fill: #21352B !important; color: #21352B !important; }
-[data-testid="stSelectbox"] [data-baseweb="select"] *,
-[data-testid="stMultiSelect"] [data-baseweb="select"] * { color: #21352B !important; }
-/* Streamlit dropdowns/datepicker are portaled outside the app container. */
-[data-baseweb="popover"], [data-baseweb="menu"],
-[data-baseweb="calendar"], [role="listbox"], [role="option"] {
+div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea,
+[data-testid="stTextInput"] input, [data-testid="stDateInput"] input,
+[data-testid="stTimeInput"] input, [data-testid="stNumberInput"] input,
+[data-testid="stSelectbox"] input, [data-testid="stMultiSelect"] input {
   background: #FFFFFF !important; color: #21352B !important;
+  -webkit-text-fill-color: #21352B !important; caret-color: #21352B !important;
 }
-[data-baseweb="popover"] *, [data-baseweb="menu"] *,
-[data-baseweb="calendar"] * { color: #21352B !important; }
+input::placeholder, textarea::placeholder { color: #7B897F !important; -webkit-text-fill-color: #7B897F !important; }
+/* Selectbox-værdier, dato-/kalenderikoner og menuvalg */
+[data-baseweb="select"] [data-testid], [data-baseweb="select"] span,
+[data-baseweb="select"] svg, [data-baseweb="input"] svg,
+[data-testid="stDateInput"] svg {
+  color: #21352B !important; fill: #21352B !important;
+}
+[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"],
+[role="listbox"], [role="option"] {
+  background-color: #FFFFFF !important; color: #21352B !important;
+}
+[data-baseweb="popover"] *, [data-baseweb="menu"] *, [data-baseweb="calendar"] * {
+  color: #21352B !important;
+}
 [role="option"][aria-selected="true"] { background: #F1E5C6 !important; }
-/* Radio navigation and segmented controls */
-[data-testid="stRadio"] label,
-[data-testid="stCheckbox"] label { color: #21352B !important; }
-[data-testid="stRadio"] label span,
-[data-testid="stCheckbox"] label span { color: #21352B !important; }
-[data-testid="stSegmentedControl"] [data-baseweb="button-group"] {
-  background: #FFFFFF !important; border: 1px solid #D5DED6 !important; border-radius: 9px !important;
-}
-[data-testid="stSegmentedControl"] button {
-  background: #FFFFFF !important; color: #21352B !important; border-color: #D5DED6 !important;
+/* Streamlit segmented control bruger moderne BaseButton, ikke altid Baseweb. */
+[data-testid="stSegmentedControl"] button,
+[data-testid="stSegmentedControl"] button * {
+  background-color: #FFFFFF !important; color: #21352B !important;
+  -webkit-text-fill-color: #21352B !important;
 }
 [data-testid="stSegmentedControl"] button[aria-pressed="true"],
+[data-testid="stSegmentedControl"] button[aria-checked="true"],
 [data-testid="stSegmentedControl"] button[data-active="true"] {
-  background: #F1E5C6 !important; color: #21352B !important;
+  background-color: #F1E5C6 !important; border-color: #CCAD61 !important;
 }
-[data-testid="stSegmentedControl"] button * { color: #21352B !important; }
-/* Buttons: no destructive red fallback */
-.stButton button, .stFormSubmitButton button, .stDownloadButton button {
-  border-radius: 9px !important; font-weight: 600 !important;
-  color: #21352B !important; background: #FFFFFF !important; border: 1px solid #BCCABC !important;
+/* Radio- og afkrydsningsmærker, kun labeltekst (ikke overstyring af ikoner) */
+[data-testid="stRadio"] label p, [data-testid="stCheckbox"] label p { color: #21352B !important; }
+/* Knapper */
+[data-testid="stButton"] button, [data-testid="stFormSubmitButton"] button,
+[data-testid="stDownloadButton"] button {
+  background: #FFFFFF !important; color: #21352B !important;
+  border: 1px solid #BBC9BE !important; border-radius: 9px !important;
 }
-.stButton button:hover, .stFormSubmitButton button:hover, .stDownloadButton button:hover {
-  background: #F1E5C6 !important; border-color: #CCAD61 !important; color: #21352B !important;
-}
-.stButton button[kind="primary"], .stFormSubmitButton button[kind="primary"],
-.stDownloadButton button[kind="primary"],
+[data-testid="stButton"] button[kind="primary"],
+[data-testid="stFormSubmitButton"] button[kind="primary"],
+[data-testid="stDownloadButton"] button[kind="primary"],
 button[data-testid="stBaseButton-primary"] {
-  background: #CCAD61 !important; border: 1px solid #B89A4D !important; color: #172A20 !important;
+  background: #CCAD61 !important; color: #172A20 !important;
+  border-color: #B89A4D !important;
 }
-.stButton button[kind="primary"] *, .stFormSubmitButton button[kind="primary"] * { color: #172A20 !important; }
-[data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"] {
-  border-radius: 12px !important;
+[data-testid="stButton"] button:hover, [data-testid="stFormSubmitButton"] button:hover {
+  border-color: #CCAD61 !important;
 }
-[data-testid="stMetric"] { background: #FFFFFF !important; padding: 14px !important; border: 1px solid #E0E8E0 !important; }
-[data-testid="stVerticalBlockBorderWrapper"] > div { background-color: #FFFFFF !important; }
-[data-testid="stTabs"] button { color: #21352B !important; }
-[data-testid="stTabs"] button[aria-selected="true"] { border-bottom-color: #CCAD61 !important; }
-[data-testid="stDataFrame"] { border-radius: 9px; overflow: hidden; }
+[data-testid="stVerticalBlockBorderWrapper"] > div { border-radius: 12px !important; }
+[data-testid="stMetric"] { background: #FFFFFF !important; padding: 12px; border-radius: 10px; }
 @media (max-width: 700px) {
   .block-container { padding-top: 1.4rem !important; padding-left: .85rem !important; padding-right: .85rem !important; }
-  h1 { font-size: 1.85rem !important; }
-  [data-testid="stRadio"] [role="radiogroup"] { gap: .35rem !important; }
+  h1 { font-size: 1.8rem !important; }
 }
 </style>""", unsafe_allow_html=True)
 
@@ -187,7 +160,7 @@ with st.sidebar:
         db.auth.sign_out();st.session_state.clear();refresh()
 
 pages=["Vagtplan","Mine vagter","Friønsker","Timer"]+(["Administration"] if admin else [])
-page=st.radio("Navigation",pages,horizontal=True,label_visibility="collapsed")
+page=st.segmented_control("Navigation",pages,default="Vagtplan",label_visibility="collapsed")
 try:
     shifts=get("shifts")
     wishes=get("unavailability")
