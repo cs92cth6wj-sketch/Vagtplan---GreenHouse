@@ -14,166 +14,91 @@ st.set_page_config(
 )
 
 st.markdown("""<style>
-/* SGK V6 – one coherent light palette. No blue UI elements. */
-:root {color-scheme: light !important; --sgk-text:#20372C; --sgk-control:#F0F2F0; --sgk-border:#CCD4CD; --sgk-gold:#CCAD61;}
-html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-  background-color:#F7F8F5 !important; color:#20372C !important;
-}
+/* SGK V8 – one unified light theme. No legacy V1–V7 overrides. */
+:root { color-scheme: light !important; --sgk-bg:#F7F8F5; --sgk-field:#F0F2F0; --sgk-text:#20372C; --sgk-border:#C8D1C9; --sgk-gold:#CCAD61; }
+html,body,.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {background:#F7F8F5 !important;color:#20372C !important;}
 [data-testid="stHeader"] {background:transparent !important;}
 .block-container {max-width:1120px !important;padding-top:2rem !important;padding-bottom:3rem !important;}
 h1,h2,h3,h4,h5,h6 {color:#20372C !important;letter-spacing:-.02em;}
-[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] *,
-[data-testid="stCheckbox"] label, [data-testid="stRadio"] label {color:#20372C !important;opacity:1 !important;}
-[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] * {color:#66796E !important;opacity:1 !important;}
+[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] * {color:#20372C !important;opacity:1 !important;}
+[data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] * {color:#66796E !important;opacity:1 !important;}
 
-/* Input wrappers, including BaseWeb internal layers. */
-.stApp div[data-baseweb="input"], .stApp div[data-baseweb="base-input"],
-.stApp div[data-baseweb="textarea"], .stApp div[data-baseweb="select"],
-.stApp div[data-baseweb="select"]>div, .stApp div[data-baseweb="select"]>div>div,
-.stApp [data-testid="stTextInput"] div[data-baseweb="input"],
-.stApp [data-testid="stDateInput"] div[data-baseweb="input"],
-.stApp [data-testid="stSelectbox"] div[data-baseweb="select"],
-.stApp [data-testid="stTextArea"] div[data-baseweb="textarea"] {
-  background-color:#F0F2F0 !important;
-  color:#20372C !important;
-  border-color:#CCD4CD !important;
-  box-shadow:none !important;
+/* Make *every layer* of the input and select light, including the BaseWeb arrow area. */
+.stApp :is([data-testid="stTextInput"],[data-testid="stTextArea"],[data-testid="stSelectbox"],
+[data-testid="stMultiSelect"],[data-testid="stNumberInput"],[data-testid="stDateInput"],
+[data-testid="stTimeInput"]) :is([data-baseweb="input"],[data-baseweb="base-input"],
+[data-baseweb="textarea"],[data-baseweb="select"],[role="combobox"]) {
+ background-color:#F0F2F0 !important;color:#20372C !important;
+ border-color:#C8D1C9 !important;box-shadow:none !important;
 }
-.stApp div[data-baseweb="input"], .stApp div[data-baseweb="select"]>div,
-.stApp div[data-baseweb="textarea"] {
-  border:1px solid #CCD4CD !important; border-radius:11px !important;
-}
-.stApp input, .stApp textarea, .stApp select,
-.stApp div[data-baseweb="select"] input,
-.stApp div[data-baseweb="select"] span,
-.stApp div[data-baseweb="select"] [role="combobox"],
-.stApp div[data-baseweb="select"] [aria-selected],
-.stApp div[data-baseweb="select"]>div *,
-.stApp [data-testid="stTextInput"] input {
-  background-color:transparent !important;
-  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
-  caret-color:#20372C !important; opacity:1 !important;
-}
-.stApp input::placeholder, .stApp textarea::placeholder {
-  color:#63766A !important; -webkit-text-fill-color:#63766A !important;opacity:1 !important;
-}
-.stApp div[data-baseweb="select"] svg, .stApp div[data-baseweb="input"] svg {
-  color:#20372C !important;fill:#20372C !important;
-}
-.stApp div[data-baseweb="input"]:focus-within,
-.stApp div[data-baseweb="select"]:focus-within,
-.stApp div[data-baseweb="textarea"]:focus-within {
-  border-color:#A58B4D !important; outline:2px solid #CCAD61 !important;
-  outline-offset:0 !important;box-shadow:0 0 0 1px #CCAD61 !important;
-}
-/* The list popup can be rendered outside .stApp */
-div[data-baseweb="popover"],div[data-baseweb="menu"],div[role="listbox"],
-li[role="option"],div[role="option"] {background:#FFFFFF !important;color:#20372C !important;}
-div[data-baseweb="popover"] *,div[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] * {
- color:#20372C !important;-webkit-text-fill-color:#20372C !important;
-}
-[role="option"]:hover,[role="option"][aria-selected="true"] {background:#EFE5CB !important;}
-/* Date popups, if any date widget is introduced again. */
-[data-baseweb="calendar"], [data-baseweb="calendar"] * {background-color:#FFFFFF !important;color:#20372C !important;}
-[data-baseweb="calendar"] button[aria-selected="true"] {background:#CCAD61 !important;color:#20372C !important;}
-/* Buttons, navigation and hover/focus states. */
-[data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,
-[data-testid="stDownloadButton"] button {
- background:#FFFFFF !important;color:#20372C !important;border:1px solid #CCD4CD !important;
- border-radius:11px !important;min-height:2.6rem !important; font-weight:650 !important;
+.stApp [data-baseweb="input"],.stApp [data-baseweb="base-input"],
+.stApp [data-baseweb="textarea"],.stApp [data-baseweb="select"]>div {
+ background:#F0F2F0 !important;color:#20372C !important;
+ border:1px solid #C8D1C9 !important;border-radius:10px !important;
  box-shadow:none !important;
 }
-[data-testid="stButton"] button *,[data-testid="stFormSubmitButton"] button *,
-[data-testid="stDownloadButton"] button * {color:inherit !important;}
-[data-testid="stButton"] button[kind="primary"],
-[data-testid="stFormSubmitButton"] button[kind="primary"],
-button[data-testid="stBaseButton-primary"] {
- background:#CCAD61 !important;color:#20372C !important;border-color:#CCAD61 !important;
+.stApp [data-baseweb="select"]>div>div,.stApp [data-baseweb="select"]>div>div>div,
+.stApp [data-baseweb="input"]>div,.stApp [data-baseweb="base-input"]>div,
+.stApp [data-baseweb="textarea"]>div {background:#F0F2F0 !important;color:#20372C !important;}
+.stApp input,.stApp textarea,.stApp [data-baseweb="select"] input,
+.stApp [data-baseweb="select"] span,.stApp [data-baseweb="select"] [role="combobox"],
+.stApp [data-baseweb="select"] [aria-selected] {
+ background:#F0F2F0 !important;color:#20372C !important;
+ -webkit-text-fill-color:#20372C !important;caret-color:#20372C !important;opacity:1 !important;
 }
-[data-testid="stButton"] button:hover, [data-testid="stDownloadButton"] button:hover {
- background:#F4EACD !important;border-color:#A58B4D !important;
+.stApp [data-testid="stTextArea"] textarea,.stApp [data-testid="stTextInput"] input {
+ background:#F0F2F0 !important;color:#20372C !important;
+ -webkit-text-fill-color:#20372C !important;
 }
-[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible,
-[data-testid="stDownloadButton"] button:focus-visible {outline:3px solid #CCAD61 !important;outline-offset:2px !important;}
-/* Native checkbox and radio accents, not blue/red. */
-input[type="checkbox"],input[type="radio"] {accent-color:#A58B4D !important;}
-[data-testid="stCheckbox"] *,[data-testid="stRadio"] * {opacity:1 !important;}
-/* Neutral message cards replace native blue st.info. */
-.sgk-notice {background:#F0F2F0;border:1px solid #CCD4CD;border-left:4px solid #CCAD61;
+.stApp input::placeholder,.stApp textarea::placeholder {color:#627468 !important;-webkit-text-fill-color:#627468 !important;opacity:1 !important;}
+.stApp [data-baseweb="select"] svg,.stApp [data-baseweb="input"] svg {color:#20372C !important;fill:currentColor !important;}
+.stApp [data-baseweb="input"]:focus-within,.stApp [data-baseweb="select"]:focus-within,
+.stApp [data-baseweb="textarea"]:focus-within {
+ border-color:#A58B4D !important;outline:2px solid #CCAD61 !important;
+ outline-offset:0 !important;box-shadow:none !important;
+}
+/* Dropdown menu is rendered in a portal outside .stApp. */
+[data-baseweb="popover"],[data-baseweb="popover"]>div,[data-baseweb="menu"],
+[role="listbox"],[role="option"] {background:#FFFFFF !important;color:#20372C !important;border-color:#C8D1C9 !important;}
+[data-baseweb="popover"] *,[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] * {color:#20372C !important;-webkit-text-fill-color:#20372C !important;}
+[role="option"]:hover,[role="option"][aria-selected="true"] {background:#F4EACA !important;}
+/* Neutral expander header and contents – fixes the navy header with unreadable text. */
+.stApp [data-testid="stExpander"],.stApp [data-testid="stExpander"] details,
+.stApp [data-testid="stExpander"] summary,.stApp [data-testid="stExpander"] summary>div,
+.stApp [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+ background:#FFFFFF !important;color:#20372C !important;border-color:#DDE4DD !important;
+}
+.stApp [data-testid="stExpander"] details {border:1px solid #DDE4DD !important;border-radius:12px !important;overflow:hidden !important;}
+.stApp [data-testid="stExpander"] summary *, .stApp [data-testid="stExpander"] summary svg {color:#20372C !important;fill:currentColor !important;}
+.stApp [data-testid="stExpander"] summary:hover {background:#F0F2F0 !important;}
+/* Buttons, including primary navigation. */
+.stApp [data-testid="stButton"] button,.stApp [data-testid="stFormSubmitButton"] button,
+.stApp [data-testid="stDownloadButton"] button {
+ background:#FFFFFF !important;color:#20372C !important;border:1px solid #C8D1C9 !important;
+ border-radius:11px !important;min-height:2.6rem !important;font-weight:650 !important;box-shadow:none !important;
+}
+.stApp [data-testid="stButton"] button *, .stApp [data-testid="stFormSubmitButton"] button * {color:inherit !important;}
+.stApp button[kind="primary"],.stApp button[data-testid="stBaseButton-primary"] {background:#CCAD61 !important;color:#20372C !important;border-color:#CCAD61 !important;}
+.stApp [data-testid="stButton"] button:hover,.stApp [data-testid="stDownloadButton"] button:hover {background:#F4EACA !important;border-color:#A58B4D !important;}
+.stApp button:focus-visible {outline:2px solid #CCAD61 !important;outline-offset:2px !important;box-shadow:none !important;}
+.stApp input[type="checkbox"],.stApp input[type="radio"] {accent-color:#CCAD61 !important;}
+/* Neutral notifications, no blue alerts. Errors remain distinct. */
+.sgk-notice {background:#F0F2F0;border:1px solid #C8D1C9;border-left:4px solid #CCAD61;
  border-radius:12px;padding:15px 18px;color:#20372C;font-size:.95rem;line-height:1.5;}
-.sgk-notice strong {color:#20372C;}
-[data-testid="stExpander"] details {background:#FFF !important;border:1px solid #DFE4DF !important;border-radius:12px !important;}
-[data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px !important;}
-.status-pill {display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;
- font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
-.status-pill.gray {background:#EEF2EE;color:#516257;}
-.status-pill.green {background:#E7F4EA;color:#326947;}
+.stApp [data-testid="stAlert"] {border-color:#C8D1C9 !important;}
+/* Cards and tables */
+.stApp [data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px !important;}
+.status-pill {display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
+.status-pill.gray {background:#EEF2EE;color:#516257;}.status-pill.green {background:#E7F4EA;color:#326947;}
 .card-title {font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
 .card-sub {font-size:.93rem;color:#51685A;margin-top:4px;}
 .summary-box {background:#FFF;border:1px solid #DFE4DF;border-radius:14px;padding:14px 18px;min-height:88px;}
-.summary-label {color:#51685A;font-size:.9rem;margin-bottom:7px;}
-.summary-value {color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
+.summary-label {color:#51685A;font-size:.9rem;margin-bottom:7px;}.summary-value {color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
 .table-wrap {border:1px solid #DFE4DF;border-radius:13px;overflow-x:auto;background:#FFF;}
 .table-clean {width:100%;border-collapse:collapse;font-size:.91rem;}
 .table-clean th {text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
 .table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
 @media(max-width:760px) {.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
-
-/* V7: comprehensive neutral surfaces and focus rings (all views). */
-:root { --primary-color:#CCAD61; --primary:#CCAD61; --secondary-background-color:#F0F2F0; }
-.stApp :is([data-testid="stTextInput"],[data-testid="stTextArea"],[data-testid="stSelectbox"],
-[data-testid="stNumberInput"],[data-testid="stDateInput"],[data-testid="stTimeInput"],
-[data-testid="stMultiSelect"]) :is([data-baseweb="input"],[data-baseweb="base-input"],
-[data-baseweb="select"],[data-baseweb="textarea"],[role="combobox"]) {
- background:#F0F2F0 !important; background-color:#F0F2F0 !important;
- color:#20372C !important; -webkit-text-fill-color:#20372C !important;
- border-color:#CCD4CD !important; box-shadow:none !important; outline-color:#CCAD61 !important;
-}
-.stApp [data-baseweb="select"] > div,
-.stApp [data-baseweb="select"] > div > div,
-.stApp [data-baseweb="select"] [role="combobox"],
-.stApp [data-baseweb="input"] > div,
-.stApp [data-baseweb="base-input"] > div {
- background:#F0F2F0 !important; color:#20372C !important;
-}
-.stApp :is(input,textarea,select,[role="combobox"],[data-baseweb="select"] span,[data-baseweb="select"] div) {
- color:#20372C !important; -webkit-text-fill-color:#20372C !important;
-}
-.stApp :is([data-baseweb="select"],[data-baseweb="input"],[data-baseweb="textarea"],button):focus,
-.stApp :is([data-baseweb="select"],[data-baseweb="input"],[data-baseweb="textarea"],button):focus-within,
-.stApp :is(input,textarea,button):focus-visible {
- border-color:#B69A55 !important; box-shadow:0 0 0 2px #CCAD61 !important;
- outline:0 !important;
-}
-/* Native alerts, errors and progress indicators: never blue. */
-.stApp [data-testid="stAlert"],.stApp [data-testid="stNotification"],
-.stApp [role="alert"] {
- background:#F0F2F0 !important; color:#20372C !important;
- border:1px solid #CCD4CD !important; border-radius:12px !important;
-}
-.stApp [data-testid="stAlert"] *, .stApp [role="alert"] * {color:#20372C !important;}
-.stApp [data-testid="stAlert"] svg {color:#A58B4D !important;fill:none !important;}
-/* Neutral dataframes/tables, tabs, links and menus. */
-.stApp [data-testid="stDataFrame"],.stApp [data-testid="stTable"],
-.stApp [data-testid="stMetric"],.stApp [data-testid="stExpander"] {
- border-color:#CCD4CD !important;box-shadow:none !important;
-}
-.stApp a,.stApp a:visited {color:#20372C !important;}
-.stApp a:focus-visible {outline:2px solid #CCAD61 !important;}
-.stApp button[role="tab"],.stApp button[role="tab"] * {color:#20372C !important;}
-.stApp button[role="tab"][aria-selected="true"] {border-bottom-color:#CCAD61 !important;}
-/* Popovers are portal-mounted and can be outside the app root. */
-[data-baseweb="popover"],[data-baseweb="popover"] > div,
-[data-baseweb="menu"],[role="listbox"],[role="option"] {
- background:#FFFFFF !important;color:#20372C !important;border-color:#CCD4CD !important;
-}
-[data-baseweb="popover"] *:focus-visible,[role="option"]:focus-visible {
- outline:2px solid #CCAD61 !important;box-shadow:none !important;
-}
-/* Avoid browser/Streamlit blue highlights in selection controls. */
-.stApp input[type="checkbox"],.stApp input[type="radio"] {accent-color:#CCAD61 !important;}
-.stApp ::selection {background:#E9D9AA;color:#20372C;}
-
 </style>""",unsafe_allow_html=True)
 
 try:
@@ -335,7 +260,9 @@ def render_shift_card(shift, names, current_user_id=None, allow_actions=True, co
             if not allow_actions:
                 return
             if shift["offered"] and not shift["locked"] and shift["employee_id"] != current_user_id:
-                if st.button("Overtag", key=f"claim_{shift['id']}", type="primary", use_container_width=True):
+                if any(w["employee_id"] == current_user_id and w["day"] == shift["shift_day"] for w in st.session_state.get("cached_wishes", [])):
+                    st.caption("Kan ikke overtages – du har ønsket fri denne dag")
+                elif st.button("Overtag", key=f"claim_{shift['id']}", type="primary", use_container_width=True):
                     try:
                         db.rpc("claim_shift", {"p_shift": shift["id"]}).execute()
                         st.success("Vagten er overtaget")
@@ -420,10 +347,26 @@ page = nav_buttons(pages)
 try:
     shifts = get("shifts")
     wishes = get("unavailability")
+    st.session_state.cached_wishes = wishes
     settings = get("settings")
 except Exception as e:
     fail(e)
     st.stop()
+
+# Friønsker kontrolleres både i UI og igen i databasen (SQL-migrationen).
+# Alle datoer er ISO-datoer (YYYY-MM-DD).
+blocked_days = {(w["employee_id"], w["day"]) for w in wishes}
+
+def has_day_off(employee_id, shift_day):
+    return employee_id is not None and (employee_id, shift_day) in blocked_days
+
+def qualified_staff(position, shift_day):
+    return [
+        person for person in staff
+        if person["active"]
+        and (person["can_waiter"] if position == "Tjener" else person["can_dishwasher"])
+        and not has_day_off(person["id"], shift_day)
+    ]
 
 if page == "Vagtplan":
     st.subheader("Vagtoversigt")
@@ -614,17 +557,19 @@ elif page == "Administration" and admin:
             start = c1.selectbox("Fra", options[:-1], index=8)
             end = c2.selectbox("Til", options, index=36)
 
-            valid_staff = [
-                x for x in staff
-                if x["active"] and (x["can_waiter"] if position == "Tjener" else x["can_dishwasher"])
-            ]
+            valid_staff = qualified_staff(position, day.isoformat())
+            excluded = [x["name"] for x in staff if x["active"] and
+                        (x["can_waiter"] if position == "Tjener" else x["can_dishwasher"]) and
+                        has_day_off(x["id"], day.isoformat())]
+            if excluded:
+                st.caption("Har ønsket fri og kan derfor ikke vælges: " + ", ".join(sorted(excluded)))
             choices = {"Ledig (udbydes)": None, **{x["name"] + " · " + x["id"][:6]: x["id"] for x in valid_staff}}
             who = st.selectbox("Tildel til", list(choices))
 
             c3, c4 = st.columns(2)
             locked = c3.checkbox("Låst vagt (kun admin kan ændre)")
             publish = c4.checkbox("Offentliggør straks", value=False)
-            note = st.text_area("Bemærkning", height=90)
+            note = st.text_input("Bemærkning")
             submitted = st.form_submit_button("Opret vagt", type="primary")
 
         if submitted:
@@ -632,6 +577,8 @@ elif page == "Administration" and admin:
                 st.error("Sluttid skal ligge efter starttid (00:00 betyder midnat).")
             elif locked and choices[who] is None:
                 st.error("Låste vagter skal tildeles en medarbejder.")
+            elif has_day_off(choices[who], day.isoformat()):
+                st.error("Medarbejderen har ønsket fri på denne dato og kan ikke tildeles vagten.")
             else:
                 try:
                     db.table("shifts").insert(
@@ -662,7 +609,20 @@ elif page == "Administration" and admin:
             notice("Ingen kommende vagter")
         for s in upcoming:
             with st.expander(f"{s['shift_day']} · {display_shift(s, names)} · {'Publiceret' if s['published'] else 'Kladde'}"):
-                opts = {"Ledig": None, **{x['name'] + ' · ' + x['id'][:6]: x['id'] for x in staff if x['active'] and (x['can_waiter'] if s['position'] == 'Tjener' else x['can_dishwasher'])}}
+                allowed = qualified_staff(s["position"], s["shift_day"])
+                # Vis en eventuel tidligere tildelt medarbejder, selvom denne siden
+                # har indsendt friønske. Admin kan så fjerne/ændre tildelingen.
+                existing_person = next((x for x in staff if x["id"] == s["employee_id"]), None)
+                if existing_person and all(x["id"] != existing_person["id"] for x in allowed):
+                    allowed.append(existing_person)
+                opts = {"Ledig": None, **{x['name'] + ' · ' + x['id'][:6]: x['id'] for x in allowed}}
+                if s["employee_id"] and has_day_off(s["employee_id"], s["shift_day"]):
+                    st.warning("Den nuværende medarbejder har friønske denne dag. Tildel vagten til en anden, eller gør den ledig.")
+                unavailable = [x["name"] for x in staff if x["active"] and
+                               has_day_off(x["id"], s["shift_day"]) and
+                               (x["can_waiter"] if s["position"] == "Tjener" else x["can_dishwasher"])]
+                if unavailable:
+                    st.caption("Kan ikke vælges (friønske): " + ", ".join(sorted(unavailable)))
                 existing = next((k for k, v in opts.items() if v == s["employee_id"]), "Ledig")
                 col1, col2, col3 = st.columns(3)
                 who = col1.selectbox("Medarbejder", list(opts), index=list(opts).index(existing), key="ass_" + s["id"])
@@ -672,6 +632,8 @@ elif page == "Administration" and admin:
                 if c1.button("Gem ændringer", key="save_" + s["id"], type="primary"):
                     if lock and opts[who] is None:
                         st.error("Låst vagt kræver medarbejder")
+                    elif has_day_off(opts[who], s["shift_day"]):
+                        st.error("Medarbejderen har ønsket fri på vagtdatoen og kan ikke tildeles vagten.")
                     else:
                         try:
                             db.table("shifts").update(
