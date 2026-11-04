@@ -118,6 +118,62 @@ input[type="checkbox"],input[type="radio"] {accent-color:#A58B4D !important;}
 .table-clean th {text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
 .table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
 @media(max-width:760px) {.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
+
+/* V7: comprehensive neutral surfaces and focus rings (all views). */
+:root { --primary-color:#CCAD61; --primary:#CCAD61; --secondary-background-color:#F0F2F0; }
+.stApp :is([data-testid="stTextInput"],[data-testid="stTextArea"],[data-testid="stSelectbox"],
+[data-testid="stNumberInput"],[data-testid="stDateInput"],[data-testid="stTimeInput"],
+[data-testid="stMultiSelect"]) :is([data-baseweb="input"],[data-baseweb="base-input"],
+[data-baseweb="select"],[data-baseweb="textarea"],[role="combobox"]) {
+ background:#F0F2F0 !important; background-color:#F0F2F0 !important;
+ color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+ border-color:#CCD4CD !important; box-shadow:none !important; outline-color:#CCAD61 !important;
+}
+.stApp [data-baseweb="select"] > div,
+.stApp [data-baseweb="select"] > div > div,
+.stApp [data-baseweb="select"] [role="combobox"],
+.stApp [data-baseweb="input"] > div,
+.stApp [data-baseweb="base-input"] > div {
+ background:#F0F2F0 !important; color:#20372C !important;
+}
+.stApp :is(input,textarea,select,[role="combobox"],[data-baseweb="select"] span,[data-baseweb="select"] div) {
+ color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+}
+.stApp :is([data-baseweb="select"],[data-baseweb="input"],[data-baseweb="textarea"],button):focus,
+.stApp :is([data-baseweb="select"],[data-baseweb="input"],[data-baseweb="textarea"],button):focus-within,
+.stApp :is(input,textarea,button):focus-visible {
+ border-color:#B69A55 !important; box-shadow:0 0 0 2px #CCAD61 !important;
+ outline:0 !important;
+}
+/* Native alerts, errors and progress indicators: never blue. */
+.stApp [data-testid="stAlert"],.stApp [data-testid="stNotification"],
+.stApp [role="alert"] {
+ background:#F0F2F0 !important; color:#20372C !important;
+ border:1px solid #CCD4CD !important; border-radius:12px !important;
+}
+.stApp [data-testid="stAlert"] *, .stApp [role="alert"] * {color:#20372C !important;}
+.stApp [data-testid="stAlert"] svg {color:#A58B4D !important;fill:none !important;}
+/* Neutral dataframes/tables, tabs, links and menus. */
+.stApp [data-testid="stDataFrame"],.stApp [data-testid="stTable"],
+.stApp [data-testid="stMetric"],.stApp [data-testid="stExpander"] {
+ border-color:#CCD4CD !important;box-shadow:none !important;
+}
+.stApp a,.stApp a:visited {color:#20372C !important;}
+.stApp a:focus-visible {outline:2px solid #CCAD61 !important;}
+.stApp button[role="tab"],.stApp button[role="tab"] * {color:#20372C !important;}
+.stApp button[role="tab"][aria-selected="true"] {border-bottom-color:#CCAD61 !important;}
+/* Popovers are portal-mounted and can be outside the app root. */
+[data-baseweb="popover"],[data-baseweb="popover"] > div,
+[data-baseweb="menu"],[role="listbox"],[role="option"] {
+ background:#FFFFFF !important;color:#20372C !important;border-color:#CCD4CD !important;
+}
+[data-baseweb="popover"] *:focus-visible,[role="option"]:focus-visible {
+ outline:2px solid #CCAD61 !important;box-shadow:none !important;
+}
+/* Avoid browser/Streamlit blue highlights in selection controls. */
+.stApp input[type="checkbox"],.stApp input[type="radio"] {accent-color:#CCAD61 !important;}
+.stApp ::selection {background:#E9D9AA;color:#20372C;}
+
 </style>""",unsafe_allow_html=True)
 
 try:
