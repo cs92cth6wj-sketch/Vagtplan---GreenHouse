@@ -8,80 +8,113 @@ st.set_page_config(page_title="SGK Café | Vagtplan",page_icon="📅",layout="wi
 # En ensartet lys visning på både mobil og desktop.
 # Farverne er også fastlagt i .streamlit/config.toml.
 st.markdown("""<style>
-/* SGK Café: let, sammenhængende tema. Undgå globale span/p-regler, som
-   tidligere gjorde kontroltekst mørk på mørke Streamlit-widgets. */
-:root { color-scheme: light !important; }
-html, body, .stApp, [data-testid="stAppViewContainer"],
-[data-testid="stMain"], [data-testid="stHeader"] {
-  background-color: #F8F9F7 !important; color: #21352B !important;
-}
-h1, h2, h3 { color: #21352B !important; }
-h1 { letter-spacing: -.025em; font-weight: 750 !important; }
-/* Interne input-containere og selve inputelementerne */
-div[data-baseweb="input"], div[data-baseweb="textarea"],
-div[data-baseweb="select"], div[data-baseweb="select"] > div,
-[data-testid="stDateInput"] [data-baseweb="input"],
-[data-testid="stTimeInput"] [data-baseweb="input"] {
-  background: #FFFFFF !important;
-  border-color: #BFCBC1 !important;
+/* SGK Café: Enkelt lyst tema. Brug målrettede widget-regler frem for
+   globale span/p-regler, så tekst og baggrund altid følges ad. */
+:root {color-scheme: light !important;}
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+  background: #F8F9F7 !important;
   color: #21352B !important;
 }
-div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea,
-[data-testid="stTextInput"] input, [data-testid="stDateInput"] input,
-[data-testid="stTimeInput"] input, [data-testid="stNumberInput"] input,
-[data-testid="stSelectbox"] input, [data-testid="stMultiSelect"] input {
-  background: #FFFFFF !important; color: #21352B !important;
-  -webkit-text-fill-color: #21352B !important; caret-color: #21352B !important;
+[data-testid="stHeader"] { background: transparent !important; }
+h1, h2, h3 {color:#21352B !important;}
+h1 {font-weight:750 !important; letter-spacing:-.025em;}
+/* Labels: de var nærmest hvide på den lyse baggrund. */
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] *,
+[data-testid="stMarkdownContainer"] > p,
+[data-testid="stTextInput"] label, [data-testid="stDateInput"] label,
+[data-testid="stSelectbox"] label, [data-testid="stTimeInput"] label,
+[data-testid="stTextArea"] label, [data-testid="stNumberInput"] label {
+  color:#21352B !important;
+  -webkit-text-fill-color:#21352B !important;
 }
-input::placeholder, textarea::placeholder { color: #7B897F !important; -webkit-text-fill-color: #7B897F !important; }
-/* Selectbox-værdier, dato-/kalenderikoner og menuvalg */
-[data-baseweb="select"] [data-testid], [data-baseweb="select"] span,
-[data-baseweb="select"] svg, [data-baseweb="input"] svg,
-[data-testid="stDateInput"] svg {
-  color: #21352B !important; fill: #21352B !important;
+/* Alle lag i BaseWeb-felter – ikke kun den yderste input-wrapper. */
+[data-baseweb="input"], [data-baseweb="base-input"],
+[data-baseweb="textarea"], [data-baseweb="select"],
+[data-baseweb="select"] > div,
+[data-testid="stDateInput"] [data-baseweb="input"],
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stTextInput"] [data-baseweb="base-input"],
+[data-testid="stDateInput"] [data-baseweb="base-input"],
+[data-testid="stTimeInput"] [data-baseweb="base-input"],
+[data-testid="stNumberInput"] [data-baseweb="base-input"] {
+  background-color:#FFFFFF !important;
+  color:#21352B !important;
+  border-color:#B7C5BB !important;
+}
+[data-testid="stTextInput"] input,
+[data-testid="stDateInput"] input,
+[data-testid="stTimeInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stSelectbox"] input,
+[data-testid="stMultiSelect"] input,
+[data-baseweb="base-input"] input,
+[data-baseweb="input"] input {
+  background-color:#FFFFFF !important;
+  color:#21352B !important;
+  -webkit-text-fill-color:#21352B !important;
+  caret-color:#21352B !important;
+  color-scheme:light !important;
+}
+input::placeholder, textarea::placeholder {
+  color:#7A887E !important;
+  -webkit-text-fill-color:#7A887E !important;
+  opacity:1 !important;
+}
+/* Selectbox-værdi, datoikon, menu og kalender. */
+[data-baseweb="select"] *, [data-baseweb="input"] svg,
+[data-testid="stDateInput"] svg {color:#21352B !important;}
+[data-baseweb="select"] svg, [data-baseweb="input"] svg {
+  fill:currentColor !important;
 }
 [data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"],
-[role="listbox"], [role="option"] {
-  background-color: #FFFFFF !important; color: #21352B !important;
+[role="listbox"], [role="option"], [role="dialog"] {
+  background-color:#FFFFFF !important; color:#21352B !important;
 }
-[data-baseweb="popover"] *, [data-baseweb="menu"] *, [data-baseweb="calendar"] * {
-  color: #21352B !important;
+[data-baseweb="popover"] *, [data-baseweb="menu"] *,
+[data-baseweb="calendar"] *, [role="listbox"] *, [role="option"] * {
+  color:#21352B !important;
 }
-[role="option"][aria-selected="true"] { background: #F1E5C6 !important; }
-/* Streamlit segmented control bruger moderne BaseButton, ikke altid Baseweb. */
+[role="option"][aria-selected="true"] {background:#F1E5C6 !important;}
+/* Segmenterede knapper skal ikke arve sort baggrund fra klienttemaet. */
 [data-testid="stSegmentedControl"] button,
-[data-testid="stSegmentedControl"] button * {
-  background-color: #FFFFFF !important; color: #21352B !important;
-  -webkit-text-fill-color: #21352B !important;
+[data-testid="stSegmentedControl"] button *,
+[data-testid="stSegmentedControl"] [role="radiogroup"] label,
+[data-testid="stSegmentedControl"] [role="radiogroup"] label * {
+  background-color:#FFFFFF !important;
+  color:#21352B !important;
+  -webkit-text-fill-color:#21352B !important;
 }
 [data-testid="stSegmentedControl"] button[aria-pressed="true"],
 [data-testid="stSegmentedControl"] button[aria-checked="true"],
 [data-testid="stSegmentedControl"] button[data-active="true"] {
-  background-color: #F1E5C6 !important; border-color: #CCAD61 !important;
+  background-color:#F1E5C6 !important;
+  border-color:#CCAD61 !important;
 }
-/* Radio- og afkrydsningsmærker, kun labeltekst (ikke overstyring af ikoner) */
-[data-testid="stRadio"] label p, [data-testid="stCheckbox"] label p { color: #21352B !important; }
-/* Knapper */
-[data-testid="stButton"] button, [data-testid="stFormSubmitButton"] button,
+[data-testid="stRadio"] label p, [data-testid="stCheckbox"] label p,
+[data-testid="stTabs"] button {color:#21352B !important;}
+/* Enkle knapper: standard hvide, primære guld. */
+[data-testid="stButton"] button,
+[data-testid="stFormSubmitButton"] button,
 [data-testid="stDownloadButton"] button {
-  background: #FFFFFF !important; color: #21352B !important;
-  border: 1px solid #BBC9BE !important; border-radius: 9px !important;
+  background-color:#FFFFFF !important;
+  color:#21352B !important;
+  border:1px solid #B7C5BB !important;
+  border-radius:9px !important;
 }
 [data-testid="stButton"] button[kind="primary"],
 [data-testid="stFormSubmitButton"] button[kind="primary"],
-[data-testid="stDownloadButton"] button[kind="primary"],
 button[data-testid="stBaseButton-primary"] {
-  background: #CCAD61 !important; color: #172A20 !important;
-  border-color: #B89A4D !important;
+  background-color:#CCAD61 !important;
+  color:#172A20 !important;
+  border-color:#B89A4D !important;
 }
-[data-testid="stButton"] button:hover, [data-testid="stFormSubmitButton"] button:hover {
-  border-color: #CCAD61 !important;
-}
-[data-testid="stVerticalBlockBorderWrapper"] > div { border-radius: 12px !important; }
-[data-testid="stMetric"] { background: #FFFFFF !important; padding: 12px; border-radius: 10px; }
-@media (max-width: 700px) {
-  .block-container { padding-top: 1.4rem !important; padding-left: .85rem !important; padding-right: .85rem !important; }
-  h1 { font-size: 1.8rem !important; }
+[data-testid="stButton"] button:hover,
+[data-testid="stFormSubmitButton"] button:hover {border-color:#CCAD61 !important;}
+[data-testid="stMetric"] {background:#FFFFFF !important; padding:12px; border-radius:10px;}
+@media(max-width:700px) {
+  .block-container {padding-top:1.4rem !important; padding-left:.85rem !important; padding-right:.85rem !important;}
+  h1 {font-size:1.8rem !important;}
 }
 </style>""", unsafe_allow_html=True)
 
