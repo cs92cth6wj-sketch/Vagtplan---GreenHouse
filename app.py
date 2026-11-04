@@ -8,113 +8,54 @@ st.set_page_config(page_title="SGK Café | Vagtplan",page_icon="📅",layout="wi
 # En ensartet lys visning på både mobil og desktop.
 # Farverne er også fastlagt i .streamlit/config.toml.
 st.markdown("""<style>
-/* SGK Café: Enkelt lyst tema. Brug målrettede widget-regler frem for
-   globale span/p-regler, så tekst og baggrund altid følges ad. */
-:root {color-scheme: light !important;}
-html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-  background: #F8F9F7 !important;
-  color: #21352B !important;
+:root { color-scheme: light; }
+html,body,.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {
+  background-color:#F8F9F7 !important; color:#21352B !important;
 }
-[data-testid="stHeader"] { background: transparent !important; }
-h1, h2, h3 {color:#21352B !important;}
-h1 {font-weight:750 !important; letter-spacing:-.025em;}
-/* Labels: de var nærmest hvide på den lyse baggrund. */
-[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] *,
-[data-testid="stMarkdownContainer"] > p,
-[data-testid="stTextInput"] label, [data-testid="stDateInput"] label,
-[data-testid="stSelectbox"] label, [data-testid="stTimeInput"] label,
-[data-testid="stTextArea"] label, [data-testid="stNumberInput"] label {
-  color:#21352B !important;
-  -webkit-text-fill-color:#21352B !important;
+[data-testid="stHeader"] { background:transparent !important; }
+.block-container { max-width:1080px !important; padding-top:2.8rem !important; padding-bottom:3rem !important; }
+h1,h2,h3,h4 { color:#21352B !important; letter-spacing:-.02em; }
+h1 { font-weight:760 !important; }
+[data-testid="stCaptionContainer"] { color:#6E8074 !important; }
+[data-testid="stWidgetLabel"] *, [data-testid="stWidgetLabel"] { color:#21352B !important; }
+/* Apply matching backgrounds and foregrounds to both the input and its wrapper. */
+[data-baseweb="input"],[data-baseweb="base-input"],
+[data-baseweb="select"],[data-baseweb="select"]>div,
+[data-baseweb="textarea"] {background:#FFF !important; color:#21352B !important; border-color:#C6D2C9 !important;}
+[data-baseweb="input"] input,[data-baseweb="base-input"] input,
+[data-baseweb="select"] input,textarea,input {
+  color:#21352B !important; -webkit-text-fill-color:#21352B !important;
+  caret-color:#21352B !important; color-scheme:light !important;
 }
-/* Alle lag i BaseWeb-felter – ikke kun den yderste input-wrapper. */
-[data-baseweb="input"], [data-baseweb="base-input"],
-[data-baseweb="textarea"], [data-baseweb="select"],
-[data-baseweb="select"] > div,
-[data-testid="stDateInput"] [data-baseweb="input"],
-[data-testid="stTextInput"] [data-baseweb="input"],
-[data-testid="stTextInput"] [data-baseweb="base-input"],
-[data-testid="stDateInput"] [data-baseweb="base-input"],
-[data-testid="stTimeInput"] [data-baseweb="base-input"],
-[data-testid="stNumberInput"] [data-baseweb="base-input"] {
-  background-color:#FFFFFF !important;
-  color:#21352B !important;
-  border-color:#B7C5BB !important;
-}
-[data-testid="stTextInput"] input,
-[data-testid="stDateInput"] input,
-[data-testid="stTimeInput"] input,
-[data-testid="stNumberInput"] input,
-[data-testid="stTextArea"] textarea,
-[data-testid="stSelectbox"] input,
-[data-testid="stMultiSelect"] input,
-[data-baseweb="base-input"] input,
-[data-baseweb="input"] input {
-  background-color:#FFFFFF !important;
-  color:#21352B !important;
-  -webkit-text-fill-color:#21352B !important;
-  caret-color:#21352B !important;
-  color-scheme:light !important;
-}
-input::placeholder, textarea::placeholder {
-  color:#7A887E !important;
-  -webkit-text-fill-color:#7A887E !important;
-  opacity:1 !important;
-}
-/* Selectbox-værdi, datoikon, menu og kalender. */
-[data-baseweb="select"] *, [data-baseweb="input"] svg,
-[data-testid="stDateInput"] svg {color:#21352B !important;}
-[data-baseweb="select"] svg, [data-baseweb="input"] svg {
-  fill:currentColor !important;
-}
-[data-baseweb="popover"], [data-baseweb="menu"], [data-baseweb="calendar"],
-[role="listbox"], [role="option"], [role="dialog"] {
-  background-color:#FFFFFF !important; color:#21352B !important;
-}
-[data-baseweb="popover"] *, [data-baseweb="menu"] *,
-[data-baseweb="calendar"] *, [role="listbox"] *, [role="option"] * {
-  color:#21352B !important;
-}
-[role="option"][aria-selected="true"] {background:#F1E5C6 !important;}
-/* Segmenterede knapper skal ikke arve sort baggrund fra klienttemaet. */
-[data-testid="stSegmentedControl"] button,
-[data-testid="stSegmentedControl"] button *,
-[data-testid="stSegmentedControl"] [role="radiogroup"] label,
-[data-testid="stSegmentedControl"] [role="radiogroup"] label * {
-  background-color:#FFFFFF !important;
-  color:#21352B !important;
-  -webkit-text-fill-color:#21352B !important;
-}
-[data-testid="stSegmentedControl"] button[aria-pressed="true"],
-[data-testid="stSegmentedControl"] button[aria-checked="true"],
-[data-testid="stSegmentedControl"] button[data-active="true"] {
-  background-color:#F1E5C6 !important;
-  border-color:#CCAD61 !important;
-}
-[data-testid="stRadio"] label p, [data-testid="stCheckbox"] label p,
-[data-testid="stTabs"] button {color:#21352B !important;}
-/* Enkle knapper: standard hvide, primære guld. */
-[data-testid="stButton"] button,
-[data-testid="stFormSubmitButton"] button,
+[data-baseweb="select"] *,[data-baseweb="input"] svg {color:#21352B !important;}
+[data-baseweb="popover"],[data-baseweb="menu"],[data-baseweb="calendar"],
+[role="listbox"],[role="option"] {background:#FFF !important;color:#21352B !important;}
+[data-baseweb="popover"] *,[data-baseweb="menu"] *,[data-baseweb="calendar"] *,[role="option"] * {color:#21352B !important;}
+/* All navigation uses Streamlit buttons, never segmented-control dark pills. */
+[data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,
 [data-testid="stDownloadButton"] button {
-  background-color:#FFFFFF !important;
-  color:#21352B !important;
-  border:1px solid #B7C5BB !important;
-  border-radius:9px !important;
+  background:#FFF !important; color:#21352B !important;
+  border:1px solid #CED9D0 !important; border-radius:11px !important;
+  min-height:2.5rem; box-shadow:none !important;
 }
+[data-testid="stButton"] button *,[data-testid="stFormSubmitButton"] button * {color:inherit !important;}
 [data-testid="stButton"] button[kind="primary"],
 [data-testid="stFormSubmitButton"] button[kind="primary"],
 button[data-testid="stBaseButton-primary"] {
-  background-color:#CCAD61 !important;
-  color:#172A20 !important;
-  border-color:#B89A4D !important;
+  background:#CCAD61 !important;color:#21352B !important;border-color:#CCAD61 !important;
+  font-weight:650 !important;
 }
-[data-testid="stButton"] button:hover,
-[data-testid="stFormSubmitButton"] button:hover {border-color:#CCAD61 !important;}
-[data-testid="stMetric"] {background:#FFFFFF !important; padding:12px; border-radius:10px;}
-@media(max-width:700px) {
-  .block-container {padding-top:1.4rem !important; padding-left:.85rem !important; padding-right:.85rem !important;}
-  h1 {font-size:1.8rem !important;}
+[data-testid="stButton"] button:hover {border-color:#B69A55 !important; background:#F8F0DA !important;}
+[data-testid="stButton"] button[kind="primary"]:hover {background:#C2A153 !important;}
+[data-testid="stMetric"] {background:#FFF !important;border:1px solid #E4E9E5; padding:12px 16px;border-radius:12px;}
+/* Shift cards are native st.container(border=True) – visible with a compact layout. */
+[data-testid="stVerticalBlockBorderWrapper"]>div[style*="border"],
+[data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px !important;}
+@media(max-width:750px) {
+  .block-container {padding:1.1rem .8rem 3rem !important;}
+  h1 {font-size:1.85rem !important;}
+  [data-testid="stHorizontalBlock"] {gap:.4rem !important;}
+  [data-testid="stButton"] button {font-size:.8rem !important;}
 }
 </style>""", unsafe_allow_html=True)
 
@@ -203,7 +144,14 @@ with st.sidebar:
         db.auth.sign_out();st.session_state.clear();refresh()
 
 pages=["Vagtplan","Mine vagter","Friønsker","Timer"]+(["Administration"] if admin else [])
-page=st.segmented_control("Navigation",pages,default="Vagtplan",label_visibility="collapsed")
+if st.session_state.get("active_page") not in pages:
+    st.session_state.active_page="Vagtplan"
+nav_cols=st.columns(len(pages),gap="small")
+for col,nav_page in zip(nav_cols,pages):
+    if col.button(nav_page, key="nav_"+nav_page, type="primary" if st.session_state.active_page==nav_page else "secondary", use_container_width=True):
+        st.session_state.active_page=nav_page
+        st.rerun()
+page=st.session_state.active_page
 try:
     shifts=get("shifts")
     wishes=get("unavailability")
@@ -222,7 +170,7 @@ if page=="Vagtplan":
     else:
         first=date.today()
         last=None
-    c_filter,c_role=st.columns(2)
+    c_filter,c_role=st.columns(2, gap="small")
     availability=c_filter.selectbox("Status", ["Alle vagter", "Ledige / til overtagelse", "Besatte"])
     kind=c_role.selectbox("Funktion", ["Alle", "Tjener", "Opvasker"])
     published=[s for s in shifts
@@ -243,39 +191,39 @@ if page=="Vagtplan":
     else:
         weekdays=["Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag","Søndag"]
         grouped={}
-        for s in published:
-            grouped.setdefault(s["shift_day"],[]).append(s)
-        # Dage uden vagter medtages aldrig i oversigten.
+        for shift in published:
+            grouped.setdefault(shift["shift_day"], []).append(shift)
+        # Only dates with published shifts are displayed.
         for day,items in grouped.items():
             d=date.fromisoformat(day)
             st.markdown(f"#### {weekdays[d.weekday()]} {d:%d/%m/%Y}")
-            for s in items:
+            for shift in items:
                 with st.container(border=True):
-                    left,right=st.columns([5,1],vertical_alignment="center")
-                    with left:
-                        st.markdown(f'**{s["start_time"][:5]}–{s["end_time"][:5]} · {s["position"]}**')
-                        if s["offered"]:
-                            if s["employee_id"]:
-                                st.caption(f'Til overtagelse · Indtil da ansvarlig: {names.get(s["employee_id"],"Ukendt")}')
-                            else:
-                                st.caption("Ledig · Ingen medarbejder tildelt")
+                    details,action=st.columns([4,1.2],gap="small",vertical_alignment="center")
+                    with details:
+                        state=shift_state(shift)
+                        st.markdown(f'**{shift["start_time"][:5]}–{shift["end_time"][:5]}  ·  {shift["position"]}**')
+                        if shift["offered"] and shift["employee_id"]:
+                            st.caption(f'Ledig til overtagelse · Ansvarlig indtil overtagelse: {names.get(shift["employee_id"],"Ukendt")}')
+                        elif shift["offered"]:
+                            st.caption("Ledig · Ingen medarbejder tildelt")
                         else:
-                            st.caption(f'Medarbejder: {names.get(s["employee_id"],"Ikke tildelt")}{" · Låst" if s["locked"] else ""}')
-                        if s.get("notes"):
-                            st.caption(s["notes"])
-                    with right:
-                        if s["offered"] and not s["locked"] and s["employee_id"]!=me["id"]:
-                            if st.button("Overtag",key="claim_"+s["id"],type="primary",use_container_width=True):
+                            st.caption(f'{state} · {names.get(shift["employee_id"],"Ikke tildelt")}{" · Låst" if shift["locked"] else ""}')
+                        if shift.get("notes"):
+                            st.caption(shift["notes"])
+                    with action:
+                        if shift["offered"] and not shift["locked"] and shift["employee_id"]!=me["id"]:
+                            if st.button("Overtag",key="claim_"+shift["id"],type="primary",use_container_width=True):
                                 try:
-                                    db.rpc("claim_shift",{"p_shift":s["id"]}).execute()
+                                    db.rpc("claim_shift",{"p_shift":shift["id"]}).execute()
                                     st.success("Vagten er overtaget")
                                     refresh()
                                 except Exception as e: fail(e)
-                        elif s["employee_id"]==me["id"] and not s["locked"]:
-                            if st.button("Træk tilbage" if s["offered"] else "Udbyd",key="offer_"+s["id"],use_container_width=True):
+                        elif shift["employee_id"]==me["id"] and not shift["locked"]:
+                            if st.button("Træk tilbage" if shift["offered"] else "Udbyd",key="offer_"+shift["id"],use_container_width=True):
                                 try:
-                                    fn="cancel_my_offer" if s["offered"] else "offer_my_shift"
-                                    db.rpc(fn,{"p_shift":s["id"]}).execute()
+                                    fn="cancel_my_offer" if shift["offered"] else "offer_my_shift"
+                                    db.rpc(fn,{"p_shift":shift["id"]}).execute()
                                     refresh()
                                 except Exception as e: fail(e)
 
