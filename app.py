@@ -56,6 +56,37 @@ button[data-testid="stBaseButton-primary"] {
   color:#20372C !important;
 }
 button[role="tab"],button[role="tab"] * {color:#20372C !important;}
+/* Administration tabs: opaque foreground for both selected and unselected tabs. */
+.stApp [data-testid="stTabs"] [data-baseweb="tab-list"],
+.stApp [data-testid="stTabs"] [data-baseweb="tab-border"] {background:transparent !important;}
+.stApp [data-testid="stTabs"] button[role="tab"],
+.stApp [data-testid="stTabs"] button[role="tab"] *,
+.stApp [data-testid="stTabs"] [data-baseweb="tab"] *,
+.stApp [data-testid="stTabs"] button[role="tab"] p {
+  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+  opacity:1 !important; text-shadow:none !important;
+}
+.stApp [data-testid="stTabs"] button[role="tab"] {background:transparent !important;}
+.stApp [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+  border-bottom:3px solid #CCAD61 !important; font-weight:750 !important;
+}
+.stApp [data-testid="stTabs"] button[role="tab"]:hover {
+  background:#F0F4EF !important;
+}
+/* Light dropdowns including the rightmost arrow region. */
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"],
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] svg {
+  background-color:#FFFFFF !important; color:#20372C !important;
+}
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] span {
+  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+}
+.stApp [data-testid="stSelectbox"] [data-baseweb="select"] > div {
+  border:1px solid #CBD5CC !important; border-radius:10px !important;
+}
+[data-testid="stAlert"] {border-radius:12px !important;}
 [data-testid="stExpander"] details {background:#FFFFFF; border-radius:12px;}
 [data-testid="stPopoverBody"] {background:#FFFFFF !important; color:#20372C !important; border:1px solid #E1E7E2 !important;}
 [data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px;}
@@ -119,43 +150,26 @@ DANISH_DAYS = ["M", "T", "O", "T", "F", "L", "S"]
 
 
 def calendar_picker(label, key, initial=None, min_date=None):
-    """Lys kalender bygget med Streamlits egne knapper i stedet for den mørke BaseWeb-datopopup."""
+    """Stabil datovælger uden en browser-popup med uforudsigelige temafarver."""
+    starting = initial or date.today()
     if key not in st.session_state:
-        st.session_state[key] = max(initial or date.today(), min_date) if min_date else (initial or date.today())
-    if key + "_month" not in st.session_state:
-        st.session_state[key + "_month"] = st.session_state[key].replace(day=1)
+        st.session_state[key] = max(starting, min_date) if min_date else starting
     chosen = st.session_state[key]
     st.markdown(f"**{label}**")
-    with st.popover(f"{chosen:%d/%m/%Y}  ·  Vælg dato", use_container_width=True):
-        month_start = st.session_state[key + "_month"]
-        previous, heading, following = st.columns([1, 4, 1], vertical_alignment="center")
-        if previous.button("‹", key=key + "_prev", use_container_width=True):
-            y, m = month_start.year, month_start.month - 1
-            if m == 0: y, m = y - 1, 12
-            st.session_state[key + "_month"] = date(y, m, 1)
-            st.rerun()
-        heading.markdown(f"**{DANISH_MONTHS[month_start.month-1].capitalize()} {month_start.year}**")
-        if following.button("›", key=key + "_next", use_container_width=True):
-            y, m = month_start.year, month_start.month + 1
-            if m == 13: y, m = y + 1, 1
-            st.session_state[key + "_month"] = date(y, m, 1)
-            st.rerun()
-        for col, dayname in zip(st.columns(7, gap="small"), DANISH_DAYS):
-            col.markdown(f"<div style='text-align:center;color:#637367;font-weight:650'>{dayname}</div>", unsafe_allow_html=True)
-        for week in calendar.monthcalendar(month_start.year, month_start.month):
-            cols = st.columns(7, gap="small")
-            for column, day_number in zip(cols, week):
-                if day_number == 0:
-                    column.write(" ")
-                    continue
-                this_date = date(month_start.year, month_start.month, day_number)
-                is_disabled = min_date is not None and this_date < min_date
-                if column.button(str(day_number), key=f"{key}_{this_date.isoformat()}",
-                                 disabled=is_disabled, type="primary" if this_date == chosen else "secondary",
-                                 use_container_width=True):
-                    st.session_state[key] = this_date
-                    st.rerun()
-    return chosen
+    cols = st.columns([1, 1.8, 1.2], gap="small")
+    years = list(range(min(chosen.year, date.today().year) - 2, max(chosen.year, date.today().year) + 9))
+    year = cols[2].selectbox("År", years, index=years.index(chosen.year), key=f"{key}_year")
+    month = cols[1].selectbox("Måned", list(range(1, 13)), index=chosen.month - 1,
+                              format_func=lambda x: DANISH_MONTHS[x - 1].capitalize(), key=f"{key}_month")
+    max_day = calendar.monthrange(year, month)[1]
+    day = cols[0].selectbox("Dag", list(range(1, max_day + 1)),
+                            index=min(chosen.day, max_day) - 1, key=f"{key}_day")
+    result = date(year, month, day)
+    if min_date and result < min_date:
+        st.warning(f"Vælg en dato fra {min_date:%d/%m/%Y} og frem.")
+        return result
+    st.session_state[key] = result
+    return result
 
 
 def month_picker(key, label="Vælg måned"):
