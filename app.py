@@ -8,62 +8,107 @@ st.set_page_config(page_title="SGK Café | Vagtplan",page_icon="📅",layout="wi
 # En ensartet lys visning på både mobil og desktop.
 # Farverne er også fastlagt i .streamlit/config.toml.
 st.markdown("""<style>
+/* SGK design: alle kontroller har lyse flader og læsbar mørk tekst. */
 :root { color-scheme: light; }
-html, body, [data-testid="stAppViewContainer"], .stApp {
-    background-color: #F8F9F7 !important;
-    color: #21352B !important;
+html, body, .stApp, [data-testid="stAppViewContainer"],
+[data-testid="stMain"], [data-testid="stMainBlockContainer"] {
+  background: #F8F9F7 !important;
+  color: #21352B !important;
 }
-[data-testid="stHeader"] { background: rgba(248,249,247,.95) !important; }
-[data-testid="stSidebar"] { background: #F0F3EF !important; }
+[data-testid="stHeader"] { background: rgba(248,249,247,.97) !important; }
+[data-testid="stSidebar"] { background: #EDF1EB !important; }
 [data-testid="stAppViewContainer"] h1,
 [data-testid="stAppViewContainer"] h2,
 [data-testid="stAppViewContainer"] h3,
+[data-testid="stAppViewContainer"] h4,
 [data-testid="stAppViewContainer"] p,
 [data-testid="stAppViewContainer"] label,
-[data-testid="stAppViewContainer"] .stMarkdown,
-[data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] {
-    color: #21352B !important;
+[data-testid="stAppViewContainer"] span,
+[data-testid="stAppViewContainer"] small,
+[data-testid="stAppViewContainer"] .stMarkdown { color: #21352B; }
+h1 { color: #21352B !important; font-weight: 750 !important; letter-spacing: -.025em; }
+h2,h3 { color: #21352B !important; }
+/* Inputs & baseweb wrappers (date, select, segmented control) */
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stDateInput"] [data-baseweb="input"],
+[data-testid="stNumberInput"] [data-baseweb="input"],
+[data-testid="stTimeInput"] [data-baseweb="input"],
+[data-testid="stTextArea"] [data-baseweb="textarea"],
+[data-testid="stSelectbox"] [data-baseweb="select"],
+[data-testid="stMultiSelect"] [data-baseweb="select"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid #C8D2CA !important;
+  border-radius: 9px !important;
 }
-h1 { font-weight: 750 !important; letter-spacing: -.03em; }
 [data-testid="stTextInput"] input,
 [data-testid="stDateInput"] input,
 [data-testid="stNumberInput"] input,
-[data-testid="stTextArea"] textarea {
-    background: #FFFFFF !important;
-    color: #21352B !important;
-    -webkit-text-fill-color: #21352B !important;
-    border: 1px solid #CBD5CD !important;
-    border-radius: 10px !important;
+[data-testid="stTimeInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+[data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+  background: #FFFFFF !important;
+  color: #21352B !important;
+  -webkit-text-fill-color: #21352B !important;
+  caret-color: #21352B !important;
 }
-[data-testid="stTextInput"] input:focus,
-[data-testid="stDateInput"] input:focus {
-    border-color: #B79A50 !important;
-    box-shadow: 0 0 0 2px rgba(204,173,97,.25) !important;
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder { color: #79867D !important; -webkit-text-fill-color: #79867D !important; }
+[data-testid="stDateInput"] svg,
+[data-testid="stSelectbox"] svg,
+[data-testid="stMultiSelect"] svg { fill: #21352B !important; color: #21352B !important; }
+[data-testid="stSelectbox"] [data-baseweb="select"] *,
+[data-testid="stMultiSelect"] [data-baseweb="select"] * { color: #21352B !important; }
+/* Streamlit dropdowns/datepicker are portaled outside the app container. */
+[data-baseweb="popover"], [data-baseweb="menu"],
+[data-baseweb="calendar"], [role="listbox"], [role="option"] {
+  background: #FFFFFF !important; color: #21352B !important;
 }
-[data-testid="stTextInput"] input::placeholder { color: #77877C !important; }
-[data-testid="stMetric"], [data-testid="stForm"],
-[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {
-    border-radius: 12px;
+[data-baseweb="popover"] *, [data-baseweb="menu"] *,
+[data-baseweb="calendar"] * { color: #21352B !important; }
+[role="option"][aria-selected="true"] { background: #F1E5C6 !important; }
+/* Radio navigation and segmented controls */
+[data-testid="stRadio"] label,
+[data-testid="stCheckbox"] label { color: #21352B !important; }
+[data-testid="stRadio"] label span,
+[data-testid="stCheckbox"] label span { color: #21352B !important; }
+[data-testid="stSegmentedControl"] [data-baseweb="button-group"] {
+  background: #FFFFFF !important; border: 1px solid #D5DED6 !important; border-radius: 9px !important;
 }
-[data-testid="stMetric"] {
-    background: white !important; padding: 16px; border: 1px solid #E3E8E1;
+[data-testid="stSegmentedControl"] button {
+  background: #FFFFFF !important; color: #21352B !important; border-color: #D5DED6 !important;
 }
-.stButton button[kind="primary"],
-.stFormSubmitButton button[kind="primary"] {
-    background: #CCAD61 !important;
-    border: 1px solid #B99A4E !important;
-    color: #172A20 !important;
-    font-weight: 700 !important;
-    border-radius: 9px !important;
+[data-testid="stSegmentedControl"] button[aria-pressed="true"],
+[data-testid="stSegmentedControl"] button[data-active="true"] {
+  background: #F1E5C6 !important; color: #21352B !important;
 }
-.stButton button[kind="primary"]:hover,
-.stFormSubmitButton button[kind="primary"]:hover {
-    background: #E0C47F !important;
-    color: #172A20 !important;
+[data-testid="stSegmentedControl"] button * { color: #21352B !important; }
+/* Buttons: no destructive red fallback */
+.stButton button, .stFormSubmitButton button, .stDownloadButton button {
+  border-radius: 9px !important; font-weight: 600 !important;
+  color: #21352B !important; background: #FFFFFF !important; border: 1px solid #BCCABC !important;
 }
-@media (max-width: 640px) {
-    .block-container { padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem; }
-    h1 { font-size: 1.8rem !important; }
+.stButton button:hover, .stFormSubmitButton button:hover, .stDownloadButton button:hover {
+  background: #F1E5C6 !important; border-color: #CCAD61 !important; color: #21352B !important;
+}
+.stButton button[kind="primary"], .stFormSubmitButton button[kind="primary"],
+.stDownloadButton button[kind="primary"],
+button[data-testid="stBaseButton-primary"] {
+  background: #CCAD61 !important; border: 1px solid #B89A4D !important; color: #172A20 !important;
+}
+.stButton button[kind="primary"] *, .stFormSubmitButton button[kind="primary"] * { color: #172A20 !important; }
+[data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"] {
+  border-radius: 12px !important;
+}
+[data-testid="stMetric"] { background: #FFFFFF !important; padding: 14px !important; border: 1px solid #E0E8E0 !important; }
+[data-testid="stVerticalBlockBorderWrapper"] > div { background-color: #FFFFFF !important; }
+[data-testid="stTabs"] button { color: #21352B !important; }
+[data-testid="stTabs"] button[aria-selected="true"] { border-bottom-color: #CCAD61 !important; }
+[data-testid="stDataFrame"] { border-radius: 9px; overflow: hidden; }
+@media (max-width: 700px) {
+  .block-container { padding-top: 1.4rem !important; padding-left: .85rem !important; padding-right: .85rem !important; }
+  h1 { font-size: 1.85rem !important; }
+  [data-testid="stRadio"] [role="radiogroup"] { gap: .35rem !important; }
 }
 </style>""", unsafe_allow_html=True)
 
@@ -103,6 +148,7 @@ def display_shift(s,names):
     return f'{s["start_time"][:5]}–{s["end_time"][:5]} · {s["position"]} · {names.get(s["employee_id"],"Ikke tildelt")}{lock}{offer}'
 
 st.title("SGK Café · Vagtplan")
+st.caption("Silkeborg Golfklub · Overblik over caféens vagter")
 if "user" not in st.session_state:
     with st.form("login"):
         email=st.text_input("E-mail")
@@ -230,7 +276,7 @@ elif page=="Administration" and admin:
             options=[f"{h:02d}:{m:02d}" for h in range(7,24) for m in (0,15,30,45)]+["00:00"]
             start=c1.selectbox("Fra",options[:-1],index=8)
             end=c2.selectbox("Til",options,index=36)
-            choices={"Ledig (udbydes)":None,**{x["name"]+" · "+x["id"][:6]:x["id"] for x in staff if x["active"]}}
+            choices={"Ledig (udbydes)":None,**{x["name"]+" · "+x["id"][:6]:x["id"] for x in staff if x["active"] and (x["can_waiter"] if position=="Tjener" else x["can_dishwasher"])}}
             who=st.selectbox("Tildel til",list(choices))
             locked=st.checkbox("Låst vagt (kun admin kan ændre)")
             publish=st.checkbox("Offentliggør straks",value=False)
@@ -249,7 +295,7 @@ elif page=="Administration" and admin:
         upcoming=sorted([s for s in shifts if s["shift_day"]>=date.today().isoformat()],key=lambda s:(s["shift_day"],s["start_time"]))
         for s in upcoming:
             with st.expander(f'{s["shift_day"]} · {display_shift(s,names)} · {"Publiceret" if s["published"] else "Kladde"}'):
-                opts={"Ledig":None,**{x["name"]+" · "+x["id"][:6]:x["id"] for x in staff if x["active"]}}
+                opts={"Ledig":None,**{x["name"]+" · "+x["id"][:6]:x["id"] for x in staff if x["active"] and (x["can_waiter"] if s["position"]=="Tjener" else x["can_dishwasher"])}}
                 existing=next((k for k,v in opts.items() if v==s["employee_id"]),"Ledig")
                 who=st.selectbox("Medarbejder",list(opts),index=list(opts).index(existing),key="ass_"+s["id"])
                 lock=st.checkbox("Låst",value=s["locked"],key="lock_"+s["id"])
