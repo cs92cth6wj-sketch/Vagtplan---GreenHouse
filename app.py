@@ -1,4 +1,6 @@
 import io
+import calendar
+from html import escape
 from datetime import date, datetime, timedelta
 import pandas as pd
 import streamlit as st
@@ -11,244 +13,69 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-st.markdown(
-    """
-<style>
+st.markdown("""<style>
 :root { color-scheme: light; }
-html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-    background-color: #F7F8F5 !important;
-    color: #20372C !important;
+.stApp, [data-testid="stAppViewContainer"] {background:#F7F8F5; color:#20372C;}
+[data-testid="stHeader"] {background:transparent;}
+.block-container {max-width:1120px; padding-top:2rem; padding-bottom:3rem;}
+h1,h2,h3,h4 {color:#20372C; letter-spacing:-.02em;}
+[data-testid="stWidgetLabel"] * {color:#20372C !important; font-weight:600;}
+[data-testid="stCaptionContainer"] {color:#6E8074 !important;}
+/* Individual widgets, no styling of all div/span/svg elements. */
+[data-testid="stTextInput"] [data-baseweb="input"],
+[data-testid="stTextArea"] [data-baseweb="textarea"],
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+[data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
+[data-testid="stNumberInput"] [data-baseweb="input"] {
+  background:#FFFFFF !important; color:#20372C !important;
+  border:1px solid #CBD5CC !important; border-radius:10px !important;
 }
-[data-testid="stHeader"] { background: transparent !important; }
-.block-container {
-    max-width: 1120px !important;
-    padding-top: 2rem !important;
-    padding-bottom: 3rem !important;
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stSelectbox"] [data-baseweb="select"] input,
+[data-testid="stSelectbox"] [data-baseweb="select"] span,
+[data-testid="stSelectbox"] [data-baseweb="select"] div,
+[data-testid="stNumberInput"] input {
+  color:#20372C !important; -webkit-text-fill-color:#20372C !important;
+  caret-color:#20372C !important;
 }
-h1, h2, h3, h4, h5, h6, p, li, span, label, div {
-    color: #20372C;
+[data-baseweb="popover"] [role="listbox"], [role="listbox"], [role="option"] {
+  background:#FFFFFF !important; color:#20372C !important;
 }
-h1 { font-weight: 780 !important; letter-spacing: -0.02em; }
-h2, h3 { letter-spacing: -0.01em; }
-[data-testid="stCaptionContainer"] { color: #839287 !important; }
-
-/* Inputs */
-[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
-    color: #20372C !important;
-    font-weight: 600 !important;
-}
-[data-testid="stDateInput"] > div,
-[data-testid="stTextInput"] > div,
-[data-testid="stTextArea"] > div,
-[data-testid="stSelectbox"] > div,
-[data-testid="stMultiSelect"] > div,
-[data-testid="stNumberInput"] > div,
-[data-testid="stTimeInput"] > div {
-    background: transparent !important;
-}
-[data-baseweb="input"],
-[data-baseweb="base-input"],
-[data-baseweb="select"] > div,
-[data-baseweb="textarea"],
-[data-baseweb="select"],
-textarea,
-input {
-    background: #FFFFFF !important;
-    color: #20372C !important;
-    border-radius: 12px !important;
-    border-color: #CBD5CC !important;
-    -webkit-text-fill-color: #20372C !important;
-    caret-color: #20372C !important;
-}
-[data-baseweb="input"] input,
-[data-baseweb="base-input"] input,
-[data-baseweb="select"] input,
-[data-baseweb="select"] div,
-[data-baseweb="select"] span,
-[data-baseweb="textarea"] textarea,
-[data-baseweb="calendar"] *,
-[role="listbox"],
-[role="option"] {
-    color: #20372C !important;
-    -webkit-text-fill-color: #20372C !important;
-}
-[data-baseweb="popover"], [data-baseweb="menu"], [role="listbox"] {
-    background: #FFFFFF !important;
-    color: #20372C !important;
-}
-svg { color: #20372C !important; }
-
-/* Kalender-popup: BaseWeb/Streamlit kan rendere denne i en separat portal.
-   Sæt lys baggrund på hele popupen og mørk tekst på dage og overskrifter. */
-[data-baseweb="popover"],
-[data-baseweb="popover"] > div,
-[data-baseweb="popover"] [data-baseweb="calendar"],
-[data-baseweb="calendar"],
-[data-baseweb="calendar"] > div,
-[data-baseweb="calendar"] [data-baseweb="datepicker"] {
-    background-color: #FFFFFF !important;
-    color: #20372C !important;
-    color-scheme: light !important;
-}
-[data-baseweb="calendar"] button,
-[data-baseweb="calendar"] [role="button"],
-[data-baseweb="calendar"] [data-baseweb="day"],
-[data-baseweb="calendar"] [data-baseweb="month"],
-[data-baseweb="calendar"] [data-baseweb="year"],
-[data-baseweb="calendar"] span,
-[data-baseweb="calendar"] div {
-    color: #20372C !important;
-    -webkit-text-fill-color: #20372C !important;
-}
-/* Dage: uden for måned / deaktiverede datoer */
-[data-baseweb="calendar"] [data-baseweb="day"]:disabled,
-[data-baseweb="calendar"] [data-baseweb="day"][aria-disabled="true"],
-[data-baseweb="calendar"] button:disabled {
-    color: #89988C !important;
-    -webkit-text-fill-color: #89988C !important;
-}
-/* Valgt dato fremhæves i SGK-guld, ikke i standard rød/mørk. */
-[data-baseweb="calendar"] [data-baseweb="day"][aria-selected="true"],
-[data-baseweb="calendar"] [data-baseweb="day"][data-selected="true"],
-[data-baseweb="calendar"] [aria-selected="true"] {
-    background-color: #CCAD61 !important;
-    color: #20372C !important;
-    -webkit-text-fill-color: #20372C !important;
-    border-radius: 999px !important;
-}
-[data-baseweb="calendar"] [data-baseweb="day"]:hover:not(:disabled) {
-    background-color: #F4E9C8 !important;
-}
-/* Pilenes SVG-ikoner og evt. måned/år-dropdowns. */
-[data-baseweb="calendar"] svg,
-[data-baseweb="calendar"] svg * {
-    color: #20372C !important;
-    fill: currentColor !important;
-}
-
-/* Checkboxes */
-[data-testid="stCheckbox"] label, [data-testid="stCheckbox"] div {
-    color: #20372C !important;
-}
-
-/* Buttons */
-[data-testid="stButton"] button,
-[data-testid="stFormSubmitButton"] button,
+[data-baseweb="popover"] [role="option"] *, [role="option"] * { color:#20372C !important; }
+[data-testid="stButton"] button, [data-testid="stFormSubmitButton"] button,
 [data-testid="stDownloadButton"] button {
-    background: #FFFFFF !important;
-    color: #20372C !important;
-    border: 1px solid #C7D2C9 !important;
-    border-radius: 14px !important;
-    min-height: 2.7rem;
-    box-shadow: none !important;
-    font-weight: 600 !important;
+  background:#FFFFFF !important; color:#20372C !important;
+  border:1px solid #C9D5CC !important; border-radius:11px !important;
+  min-height:2.55rem; font-weight:600;
 }
-button[kind="primary"],
+[data-testid="stButton"] button[kind="primary"],
 [data-testid="stFormSubmitButton"] button[kind="primary"],
 button[data-testid="stBaseButton-primary"] {
-    background: #CCAD61 !important;
-    border-color: #CCAD61 !important;
-    color: #20372C !important;
+  background:#CCAD61 !important; border-color:#CCAD61 !important;
+  color:#20372C !important;
 }
-[data-testid="stButton"] button:hover,
-[data-testid="stDownloadButton"] button:hover {
-    border-color: #B89A52 !important;
-    background: #F8F0D8 !important;
-}
-button[kind="primary"]:hover { background: #C2A153 !important; }
-
-/* Tabs */
-button[role="tab"] {
-    color: #20372C !important;
-    font-weight: 600 !important;
-}
-button[role="tab"][aria-selected="true"] {
-    color: #20372C !important;
-}
-
-/* Cards and expanders */
-[data-testid="stMetric"] {
-    background: #FFFFFF !important;
-    border: 1px solid #E1E7E2;
-    border-radius: 16px;
-    padding: 12px 16px;
-}
-[data-testid="stExpander"] details {
-    border: 1px solid #E1E7E2 !important;
-    border-radius: 14px !important;
-    background: #FFFFFF !important;
-}
-[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 16px !important;
-}
-.card-box {
-    background: #FFFFFF;
-    border: 1px solid #E1E7E2;
-    border-radius: 16px;
-    padding: 18px 20px;
-    margin-bottom: 12px;
-}
-.card-title { font-size: 1.05rem; font-weight: 700; color: #20372C; margin: 0 0 6px 0; }
-.card-sub { color: #6F7F74; font-size: 0.96rem; margin: 0; }
-.status-pill {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    background: #F4EACA;
-    color: #6B5621;
-    margin-bottom: 8px;
-}
-.status-pill.gray { background: #EEF2EE; color: #516257; }
-.status-pill.green { background: #E7F4EA; color: #326947; }
-.summary-box {
-    background: #FFFFFF;
-    border: 1px solid #E1E7E2;
-    border-radius: 16px;
-    padding: 18px 20px;
-    min-height: 104px;
-}
-.summary-label { color: #7E8F83; font-size: .95rem; margin-bottom: 8px; }
-.summary-value { color: #20372C; font-size: 2rem; font-weight: 760; line-height: 1; }
-.table-wrap {
-    background: #FFFFFF;
-    border: 1px solid #E1E7E2;
-    border-radius: 16px;
-    overflow: hidden;
-}
-.table-clean {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-}
-.table-clean th {
-    text-align: left;
-    background: #F5F7F5;
-    color: #20372C;
-    font-weight: 700;
-    padding: 12px 14px;
-    border-bottom: 1px solid #E1E7E2;
-}
-.table-clean td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #EDF1EE;
-    color: #20372C;
-    vertical-align: top;
-}
-.table-clean tr:last-child td { border-bottom: none; }
-.muted { color: #839287 !important; }
-.small-gap { margin-top: .3rem; }
-
-@media (max-width: 760px) {
-    .block-container { padding: 1rem .85rem 3rem !important; }
-    h1 { font-size: 2rem !important; }
-    .summary-value { font-size: 1.7rem; }
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
+button[role="tab"],button[role="tab"] * {color:#20372C !important;}
+[data-testid="stExpander"] details {background:#FFFFFF; border-radius:12px;}
+[data-testid="stPopoverBody"] {background:#FFFFFF !important; color:#20372C !important; border:1px solid #E1E7E2 !important;}
+[data-testid="stVerticalBlockBorderWrapper"] {border-radius:14px;}
+.status-pill {display:inline-block;padding:4px 10px;border-radius:50px;
+  font-size:.81rem;font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
+.status-pill.gray {background:#EEF2EE;color:#516257;}
+.status-pill.green {background:#E7F4EA;color:#326947;}
+.card-title {font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
+.card-sub {font-size:.93rem;color:#6B7C70;margin-top:4px;}
+.summary-box {background:#FFFFFF;border:1px solid #E1E7E2;border-radius:14px;
+  padding:14px 18px;min-height:88px;}
+.summary-label {color:#6F8175;font-size:.9rem;margin-bottom:7px;}
+.summary-value {color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
+.table-wrap {border:1px solid #E1E7E2;border-radius:13px;overflow-x:auto;background:#FFF;}
+.table-clean {width:100%;border-collapse:collapse;font-size:.91rem;}
+.table-clean th {text-align:left;background:#F2F5F1;color:#20372C;padding:11px 13px;white-space:nowrap;}
+.table-clean td {color:#20372C;padding:11px 13px;border-top:1px solid #ECF0ED;}
+@media(max-width:760px){.block-container{padding:1rem .8rem 3rem !important;}
+ h1{font-size:1.85rem !important;}}
+</style>""",unsafe_allow_html=True)
 
 try:
     URL = st.secrets["SUPABASE_URL"]
@@ -285,6 +112,65 @@ def hours(shift):
     if b <= a:
         b += timedelta(days=1)
     return round((b - a).total_seconds() / 3600, 2)
+
+
+DANISH_MONTHS = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+DANISH_DAYS = ["M", "T", "O", "T", "F", "L", "S"]
+
+
+def calendar_picker(label, key, initial=None, min_date=None):
+    """Lys kalender bygget med Streamlits egne knapper i stedet for den mørke BaseWeb-datopopup."""
+    if key not in st.session_state:
+        st.session_state[key] = max(initial or date.today(), min_date) if min_date else (initial or date.today())
+    if key + "_month" not in st.session_state:
+        st.session_state[key + "_month"] = st.session_state[key].replace(day=1)
+    chosen = st.session_state[key]
+    st.markdown(f"**{label}**")
+    with st.popover(f"{chosen:%d/%m/%Y}  ·  Vælg dato", use_container_width=True):
+        month_start = st.session_state[key + "_month"]
+        previous, heading, following = st.columns([1, 4, 1], vertical_alignment="center")
+        if previous.button("‹", key=key + "_prev", use_container_width=True):
+            y, m = month_start.year, month_start.month - 1
+            if m == 0: y, m = y - 1, 12
+            st.session_state[key + "_month"] = date(y, m, 1)
+            st.rerun()
+        heading.markdown(f"**{DANISH_MONTHS[month_start.month-1].capitalize()} {month_start.year}**")
+        if following.button("›", key=key + "_next", use_container_width=True):
+            y, m = month_start.year, month_start.month + 1
+            if m == 13: y, m = y + 1, 1
+            st.session_state[key + "_month"] = date(y, m, 1)
+            st.rerun()
+        for col, dayname in zip(st.columns(7, gap="small"), DANISH_DAYS):
+            col.markdown(f"<div style='text-align:center;color:#637367;font-weight:650'>{dayname}</div>", unsafe_allow_html=True)
+        for week in calendar.monthcalendar(month_start.year, month_start.month):
+            cols = st.columns(7, gap="small")
+            for column, day_number in zip(cols, week):
+                if day_number == 0:
+                    column.write(" ")
+                    continue
+                this_date = date(month_start.year, month_start.month, day_number)
+                is_disabled = min_date is not None and this_date < min_date
+                if column.button(str(day_number), key=f"{key}_{this_date.isoformat()}",
+                                 disabled=is_disabled, type="primary" if this_date == chosen else "secondary",
+                                 use_container_width=True):
+                    st.session_state[key] = this_date
+                    st.rerun()
+    return chosen
+
+
+def month_picker(key, label="Vælg måned"):
+    st.markdown(f"**{label}**")
+    today = date.today()
+    if key not in st.session_state:
+        st.session_state[key] = (today.year, today.month)
+    year, month = st.session_state[key]
+    c1, c2 = st.columns([2, 1], gap="small")
+    month = c1.selectbox("Måned", list(range(1, 13)), index=month - 1,
+                         format_func=lambda v: DANISH_MONTHS[v - 1].capitalize(), key=key + "_m")
+    year = c2.selectbox("År", list(range(today.year - 3, today.year + 6)),
+                        index=max(0, min(8, year - (today.year - 3))), key=key + "_y")
+    st.session_state[key] = (year, month)
+    return f"{year:04d}-{month:02d}"
 
 
 def shift_state(shift):
@@ -355,7 +241,7 @@ def render_shift_card(shift, names, current_user_id=None, allow_actions=True, co
                 unsafe_allow_html=True,
             )
             st.markdown(f"<div class='card-title'>{title}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='card-sub'>{subtitle}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='card-sub'>{escape(subtitle)}</div>", unsafe_allow_html=True)
             if shift.get("notes"):
                 st.caption(shift["notes"])
         with right:
@@ -385,12 +271,12 @@ def render_html_table(df):
         return
     html = ["<div class='table-wrap'><table class='table-clean'><thead><tr>"]
     for col in df.columns:
-        html.append(f"<th>{col}</th>")
+        html.append(f"<th>{escape(str(col))}</th>")
     html.append("</tr></thead><tbody>")
     for _, row in df.iterrows():
         html.append("<tr>")
         for col in df.columns:
-            html.append(f"<td>{row[col]}</td>")
+            html.append(f"<td>{escape(str(row[col]))}</td>")
         html.append("</tr>")
     html.append("</tbody></table></div>")
     st.markdown("".join(html), unsafe_allow_html=True)
@@ -456,10 +342,9 @@ if page == "Vagtplan":
     st.subheader("Vagtoversigt")
     st.caption("Kun offentliggjorte vagter. Ubesatte og udbudte vagter kan overtages; øvrige viser, hvem der er på arbejde.")
 
-    period_cols = st.columns([1.2, 1.2, 4], gap="small")
-    view = period_cols[0].radio("Periode", ["Alle kommende", "Vælg uge"], horizontal=True, label_visibility="collapsed")
+    view = st.radio("Periode", ["Alle kommende", "Vælg uge"], horizontal=True)
     if view == "Vælg uge":
-        chosen = period_cols[1].date_input("Vælg uge", date.today(), label_visibility="collapsed")
+        chosen = calendar_picker("Ugevalg", "week_picker", date.today())
         first, last = dates_of_week(chosen)
         st.caption(f"Uge {first.isocalendar().week} · {first:%d/%m}–{last:%d/%Y}")
     else:
@@ -528,8 +413,9 @@ elif page == "Friønsker":
     st.caption(f"Frist for friønsker: {deadline or 'Ikke fastsat'}")
     mine = [w for w in wishes if w["employee_id"] == me["id"]]
     if deadline and date.today() <= date.fromisoformat(deadline):
+        chosen_wish_day = calendar_picker("Dag, jeg ikke kan arbejde", "wish_day", date.today(), min_date=date.today())
         with st.form("wish"):
-            d = st.date_input("Jeg kan ikke arbejde denne dag", min_value=date.today())
+            d = chosen_wish_day
             note = st.text_input("Bemærkning (valgfri)")
             if st.form_submit_button("Gem friønske", type="primary"):
                 try:
@@ -558,57 +444,63 @@ elif page == "Friønsker":
                         fail(e)
 
 elif page == "Timer":
-    st.subheader("Timer")
-    chosen_month = st.date_input("Vælg måned", date.today().replace(day=1))
-    month = chosen_month.strftime("%Y-%m")
-    visible = [
-        s for s in shifts
-        if s["published"] and s["shift_day"].startswith(month) and (admin or s["employee_id"] == me["id"])
-    ]
-    rows = [
-        {
-            "Dato": s["shift_day"],
-            "Navn": names.get(s["employee_id"], "Ledig"),
-            "Funktion": s["position"],
-            "Fra": s["start_time"][:5],
-            "Til": s["end_time"][:5],
-            "Planlagte timer": str(hours(s)).replace(".", ","),
-        }
-        for s in visible
-    ]
-    df = pd.DataFrame(rows, columns=["Dato", "Navn", "Funktion", "Fra", "Til", "Planlagte timer"])
+    st.subheader("Timer og bemanding")
+    month = month_picker("hours_month")
+    month_shifts = [s for s in shifts if s["published"] and s["shift_day"].startswith(month)]
+    assigned = [s for s in month_shifts if s["employee_id"] is not None and (admin or s["employee_id"] == me["id"])]
+    open_shifts = [s for s in month_shifts if s["employee_id"] is None] if admin else []
+    total_assigned = sum(hours(s) for s in assigned)
+    total_open = sum(hours(s) for s in open_shifts)
 
-    total_hours = sum(hours(s) for s in visible)
-    s1, s2 = st.columns(2, gap="small")
-    with s1:
-        summary_card("Planlagte timer", f"{total_hours:.2f}".replace(".", ","))
-    with s2:
-        summary_card("Antal vagter", len(visible))
+    m1, m2, m3 = st.columns(3, gap="small")
+    with m1: summary_card("Tildelte timer", f"{total_assigned:.2f}".replace(".", ","))
+    with m2: summary_card("Ledige vagttimer" if admin else "Mine vagter", f"{total_open:.2f}".replace(".", ",") if admin else len(assigned))
+    with m3: summary_card("Tildelte vagter", len(assigned))
 
-    if df.empty:
-        st.info("Ingen vagter i den valgte måned.")
+    st.markdown("### Timer pr. medarbejder" if admin else "### Mine planlagte vagter")
+    assigned_rows = [{
+        "Dato": s["shift_day"], "Navn": names.get(s["employee_id"], "Ukendt"),
+        "Funktion": s["position"], "Fra": s["start_time"][:5], "Til": s["end_time"][:5],
+        "Planlagte timer": hours(s)
+    } for s in sorted(assigned, key=lambda x: (x["shift_day"], x["start_time"]))]
+    assigned_df = pd.DataFrame(assigned_rows, columns=["Dato", "Navn", "Funktion", "Fra", "Til", "Planlagte timer"])
+    if assigned_df.empty:
+        st.info("Ingen tildelte vagter i den valgte måned.")
+        summary = pd.DataFrame(columns=["Navn", "Timer"])
     else:
-        render_html_table(df)
-        st.caption("Timerne er planlagte, ikke faktiske arbejdstimer. Pauser er ikke fratrukket.")
-        summary = (
-            pd.DataFrame([{"Navn": names.get(s["employee_id"], "Ledig"), "Timer": hours(s)} for s in visible])
-            .groupby("Navn", as_index=False)["Timer"].sum()
-        )
-        summary["Timer"] = summary["Timer"].map(lambda x: f"{x:.2f}".replace(".", ","))
-        st.markdown("### Timer pr. medarbejder")
-        render_html_table(summary)
-        buf = io.BytesIO()
-        export_df = df.copy()
-        export_sum = summary.copy()
-        with pd.ExcelWriter(buf, engine="openpyxl") as writer:
-            export_df.to_excel(writer, index=False, sheet_name="Vagter")
-            export_sum.to_excel(writer, index=False, sheet_name="Oversigt")
-        st.download_button(
-            "Download Excel",
-            buf.getvalue(),
-            file_name=f"SGK_vagttimer_{month}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
+        summary = assigned_df.groupby("Navn", as_index=False)["Planlagte timer"].sum()
+        summary.columns = ["Navn", "Timer"]
+        show_summary = summary.copy()
+        show_summary["Timer"] = show_summary["Timer"].map(lambda v: f"{v:.2f}".replace(".", ","))
+        render_html_table(show_summary)
+        with st.expander("Vis alle tildelte vagter"):
+            shown = assigned_df.copy()
+            shown["Planlagte timer"] = shown["Planlagte timer"].map(lambda v: f"{v:.2f}".replace(".", ","))
+            render_html_table(shown)
+
+    if admin:
+        st.markdown("### Ledige vagter – manglende bemanding")
+        if open_shifts:
+            open_rows = [{"Dato": s["shift_day"], "Funktion": s["position"], "Fra": s["start_time"][:5],
+                          "Til": s["end_time"][:5], "Timer": hours(s)} for s in sorted(open_shifts, key=lambda x: (x["shift_day"], x["start_time"]))]
+            open_df = pd.DataFrame(open_rows)
+            shown_open = open_df.copy()
+            shown_open["Timer"] = shown_open["Timer"].map(lambda v: f"{v:.2f}".replace(".", ","))
+            render_html_table(shown_open)
+        else:
+            open_df = pd.DataFrame(columns=["Dato", "Funktion", "Fra", "Til", "Timer"])
+            st.caption("Ingen ubesatte vagter i denne måned.")
+    st.caption("Timerne er planlagte, ikke faktisk registrerede arbejdstimer. Pauser er ikke fratrukket. Udbudte vagter tæller fortsat hos den ansvarlige medarbejder, indtil en kollega overtager.")
+
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        assigned_df.to_excel(writer, index=False, sheet_name="Tildelte vagter")
+        summary.to_excel(writer, index=False, sheet_name="Medarbejdertimer")
+        if admin:
+            open_df.to_excel(writer, index=False, sheet_name="Ledige vagter")
+    st.download_button("Download Excel-rapport", buf.getvalue(),
+                       file_name=f"SGK_vagttimer_{month}.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 elif page == "Administration" and admin:
     st.subheader("Administration")
@@ -616,10 +508,9 @@ elif page == "Administration" and admin:
 
     with tab1:
         st.caption("Opret nye vagter og vælg, om de skal være ledige, tildelt eller låste.")
+        day = calendar_picker("Dato for vagten", "new_shift_date", date.today())
         with st.form("new_shift", clear_on_submit=True):
-            dcol1, dcol2 = st.columns([1.2, 1.8], gap="small")
-            day = dcol1.date_input("Dato", date.today())
-            position = dcol2.selectbox("Funktion", ["Tjener", "Opvasker"])
+            position = st.selectbox("Funktion", ["Tjener", "Opvasker"])
 
             c1, c2 = st.columns(2)
             options = [f"{h:02d}:{m:02d}" for h in range(7, 24) for m in (0, 15, 30, 45)] + ["00:00"]
@@ -708,7 +599,7 @@ elif page == "Administration" and admin:
         current_deadline = None
         if settings and settings[0].get("wishes_deadline"):
             current_deadline = date.fromisoformat(settings[0]["wishes_deadline"])
-        new_deadline = st.date_input("Frist for friønsker", value=current_deadline or (date.today() + timedelta(days=14)))
+        new_deadline = calendar_picker("Frist for friønsker", "deadline_date", current_deadline or (date.today() + timedelta(days=14)))
         if st.button("Gem frist", type="primary"):
             try:
                 db.table("settings").update({"wishes_deadline": new_deadline.isoformat()}).eq("id", 1).execute()
