@@ -14,9 +14,7 @@ st.set_page_config(
 )
 
 st.markdown("""<style>
-/* SGK v4: one high-contrast theme; controls are intentionally dark with white text.
-   Do not paint individual nested selectbox layers white: Streamlit leaves
-   the other layers dark, creating invisible text. */
+/* SGK: samlet lyst tema. Lysegrå kontrolfelter med mørk, læsbar tekst. */
 :root {color-scheme:light;}
 .stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {
  background:#F7F8F5 !important;color:#20372C !important;
@@ -27,64 +25,73 @@ h1,h2,h3,h4,h5,h6{color:#20372C !important;letter-spacing:-.02em;}
 [data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] *,
 [data-testid="stCheckbox"] label,[data-testid="stRadio"] label {color:#20372C !important;opacity:1 !important;}
 [data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] *{color:#66796E !important;opacity:1 !important;}
-
-/* Stable input foreground and background for ALL Streamlit forms */
+/* Alle Streamlit-inputs, inkl. indre lag af selectbox / date / tekst. */
 .stApp [data-baseweb="input"],
 .stApp [data-baseweb="base-input"],
 .stApp [data-baseweb="textarea"],
 .stApp [data-baseweb="select"],
 .stApp [data-baseweb="select"]>div,
 .stApp [data-baseweb="select"]>div>div,
-.stApp [data-testid="stDateInput"] [data-baseweb="input"]{
- background:#26332F !important;color:#FFFFFF !important;border-color:#46584D !important;
+.stApp [data-testid="stDateInput"] [data-baseweb="input"] {
+ background:#F0F2F0 !important;color:#20372C !important;border-color:#CBD2CC !important;
 }
 .stApp [data-baseweb="select"]>div,
 .stApp [data-baseweb="input"],
-.stApp [data-baseweb="textarea"]{border:1px solid #46584D !important;border-radius:10px !important;}
+.stApp [data-baseweb="textarea"] {border:1px solid #CBD2CC !important;border-radius:10px !important;}
 .stApp input,.stApp textarea,
 .stApp [data-baseweb="select"] input,
 .stApp [data-baseweb="select"] span,
 .stApp [data-baseweb="select"] [aria-selected],
-.stApp [data-baseweb="select"]>div *{
- color:#FFFFFF !important;-webkit-text-fill-color:#FFFFFF !important;caret-color:#FFFFFF !important;
+.stApp [data-baseweb="select"]>div * {
+ color:#20372C !important;-webkit-text-fill-color:#20372C !important;caret-color:#20372C !important;
 }
-.stApp input::placeholder,.stApp textarea::placeholder{color:#D5DDD7 !important;-webkit-text-fill-color:#D5DDD7 !important;opacity:1 !important;}
-.stApp [data-baseweb="select"] svg,.stApp [data-baseweb="input"] svg{color:#FFFFFF !important;fill:#FFFFFF !important;}
-/* Popovers are portals and sometimes rendered outside .stApp */
+.stApp input::placeholder,.stApp textarea::placeholder {
+ color:#65746A !important;-webkit-text-fill-color:#65746A !important;opacity:1 !important;
+}
+.stApp [data-baseweb="select"] svg,.stApp [data-baseweb="input"] svg {
+ color:#20372C !important;fill:#20372C !important;
+}
+.stApp [data-baseweb="input"]:focus-within,
+.stApp [data-baseweb="select"]:focus-within,
+.stApp [data-baseweb="textarea"]:focus-within {
+ outline:2px solid #CCAD61 !important;outline-offset:1px !important;
+}
+/* Popup-menuer kan ligge uden for .stApp. */
 [data-baseweb="popover"],[data-baseweb="menu"],[role="listbox"],
-[data-baseweb="popover"] [role="option"]{
- background:#26332F !important;color:#FFFFFF !important;
+[data-baseweb="popover"] [role="option"] {
+ background:#F7F8F5 !important;color:#20372C !important;
 }
-[data-baseweb="popover"] *,[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] *{
- color:#FFFFFF !important;-webkit-text-fill-color:#FFFFFF !important;
+[data-baseweb="popover"] *,[data-baseweb="menu"] *,[role="listbox"] *,[role="option"] * {
+ color:#20372C !important;-webkit-text-fill-color:#20372C !important;
 }
-[role="option"]:hover,[role="option"][aria-selected="true"]{background:#45594D !important;}
-/* Native date picker fallback */
-[data-baseweb="calendar"],[data-baseweb="calendar"] * {background-color:#26332F !important;color:#FFFFFF !important;}
-[data-baseweb="calendar"] button[aria-selected="true"]{background:#CCAD61 !important;color:#20372C !important;}
-
-/* Primary actions and secondary navigation */
+[role="option"]:hover,[role="option"][aria-selected="true"] {background:#E6EAE6 !important;}
+/* Native datovælger hvis en ny senere tilføjes */
+[data-baseweb="calendar"],[data-baseweb="calendar"] * {
+ background-color:#F7F8F5 !important;color:#20372C !important;
+}
+[data-baseweb="calendar"] button[aria-selected="true"] {background:#CCAD61 !important;color:#20372C !important;}
+/* Knapper: hvide sekundære, SGK-guld primære */
 [data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,
-[data-testid="stDownloadButton"] button{
- background:#FFFFFF !important;color:#20372C !important;border:1px solid #C3D0C6 !important;
+[data-testid="stDownloadButton"] button {
+ background:#FFFFFF !important;color:#20372C !important;border:1px solid #CBD2CC !important;
  border-radius:11px !important;min-height:2.6rem !important;font-weight:650 !important;
 }
 [data-testid="stButton"] button *,[data-testid="stFormSubmitButton"] button *,
-[data-testid="stDownloadButton"] button *{color:inherit !important;}
+[data-testid="stDownloadButton"] button * {color:inherit !important;}
 [data-testid="stButton"] button[kind="primary"],
 [data-testid="stFormSubmitButton"] button[kind="primary"],
-button[data-testid="stBaseButton-primary"]{
+button[data-testid="stBaseButton-primary"] {
  background:#CCAD61 !important;color:#20372C !important;border-color:#CCAD61 !important;
 }
-[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover{
+[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover {
  background:#F5EACA !important;border-color:#AE8D45 !important;
 }
-[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible{
+[data-testid="stButton"] button:focus-visible,[data-testid="stFormSubmitButton"] button:focus-visible {
  outline:3px solid #A17F2E !important;outline-offset:2px !important;
 }
-[data-testid="stCheckbox"] *,[data-testid="stRadio"] *{opacity:1 !important;}
+[data-testid="stCheckbox"] *,[data-testid="stRadio"] * {opacity:1 !important;}
 [data-testid="stAlert"]{border-radius:12px !important;}
-[data-testid="stExpander"] details{background:#FFF !important;border:1px solid #E1E7E2 !important;border-radius:12px !important;}
+[data-testid="stExpander"] details {background:#FFF !important;border:1px solid #DFE4DF !important;border-radius:12px !important;}
 [data-testid="stVerticalBlockBorderWrapper"]{border-radius:14px !important;}
 .status-pill{display:inline-block;padding:4px 10px;border-radius:50px;font-size:.81rem;
  font-weight:650;background:#F4EACA;color:#6B5621;margin-bottom:7px;}
@@ -92,12 +99,12 @@ button[data-testid="stBaseButton-primary"]{
 .status-pill.green{background:#E7F4EA;color:#326947;}
 .card-title{font-size:1.03rem;font-weight:730;color:#20372C;margin:2px 0;}
 .card-sub{font-size:.93rem;color:#51685A;margin-top:4px;}
-.summary-box{background:#FFF;border:1px solid #DDE6DE;border-radius:14px;padding:14px 18px;min-height:88px;}
+.summary-box{background:#FFF;border:1px solid #DFE4DF;border-radius:14px;padding:14px 18px;min-height:88px;}
 .summary-label{color:#51685A;font-size:.9rem;margin-bottom:7px;}
 .summary-value{color:#20372C;font-size:1.75rem;font-weight:740;line-height:1.2;}
-.table-wrap{border:1px solid #DDE6DE;border-radius:13px;overflow-x:auto;background:#FFF;}
+.table-wrap{border:1px solid #DFE4DF;border-radius:13px;overflow-x:auto;background:#FFF;}
 .table-clean{width:100%;border-collapse:collapse;font-size:.91rem;}
-.table-clean th{text-align:left;background:#EDF3EC;color:#20372C;padding:11px 13px;white-space:nowrap;}
+.table-clean th{text-align:left;background:#F0F2F0;color:#20372C;padding:11px 13px;white-space:nowrap;}
 .table-clean td{color:#20372C;padding:11px 13px;border-top:1px solid #E7EEE8;}
 @media(max-width:760px){.block-container{padding:1rem .8rem 3rem !important;}h1{font-size:1.85rem !important;}}
 </style>""",unsafe_allow_html=True)
